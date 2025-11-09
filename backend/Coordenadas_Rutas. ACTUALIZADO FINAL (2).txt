@@ -1,0 +1,114 @@
+RUTAS UNIVERSIDAD DE LOS LLANOS - VILLAVICENCIO
+=================================================
+
+"Universidad de los Llanos": (4.0743475, -73.5831012),
+
+RUTA 1: COVISAN
+
+"FRENTE A DROGUERIA ESTERO 24 HRS": (4.137382580639455, -73.58885732979265),
+"Bomba de covisan": (4.137044600544384, -73.58611775013537),
+"Parqueadero frente apto del salitre": (4.1374255554708155, -73.58062353242946),
+"Apto amarillo vía campanario": (4.135687634583205, -73.57288270125707),
+"Asadero frente campanario": (4.132972109123578, -73.56518652520892),
+"Entrada mega colegio san Antonio": (4.128104648390391, -73.56865668720049),
+
+Ruta 2: MARACOS
+
+" MONTALLANTAS DE LA BOMBA AV MARACOS": (4.13552106397997, -73.61807039325423),
+"Panadería frente al lavadero estero": (4.13409017454823, -73.61332359946589),
+"Esquina parque mi llanura": (4.132590004536511, -73.6085685579279),
+"Glorieta Terminal": (4.130202231055461, -73.601190463203),
+"Montallantas alto el pinilla": (L4.129477910398299, -73.59147464055116),
+"Frente a la policía Metropolitana": (4.124564626324602, -73.57685393036422),
+"Entrada kirpas en los paraderos públicos": (4.118323862225342, -73.58489415317285),
+"Lavadero 24 hrs": (4.116351093994522, -73.59260362691673),
+"Pan rolo": (4.116239984047486, -73.59726759110157),
+
+
+Ruta 3: TERMINAL
+
+"FRENTE AL BANCO W DE HATO GRANDE": (4.147253240909574, -73.6167636069801),
+"Puesto de salud frente a la olímpica": (4.146118425188982, -73.61115923806648),
+"Semáforo del manantial": (4.145379046807378, -73.60647894478174),
+"Semáforo de la morgue": (4.138752381525013, -73.60305363974093),
+"Motores kumis": (4.135365563448674, -73.60444510363502),
+"Colanta": (4.1306412399351675, -73.6059691352843),
+"Semáforo de los apts cerro campestre": (4.1253989085731595, -73.60997574534572),
+
+
+Ruta 4: VILLACENTRO
+
+"PROTERIA PRINCIPAL DE CC VILLACENTRO, POR LA ENTRADA DEL SUPER. OLIMPICA": (4.133507095203031, -73.63778693472067),
+"Mazorcadas frente al ed. De la fiscalía": (4.133534825435542, -73.63526082922066),
+"Paradero de servicio publico, Frente a la pizzeria dominos": (4.132326624763273, -73.63243019970727),
+"Drogueria la rebaja frente a sipote malteada": (4.131196087508695, -73.62869847809588),
+
+Ruta 5: VIVA
+
+"SEMAFORO CC VIVA, VIA VILLABOLIVAR": (4.125877593020011, -73.6365387786239),
+"Boutique revival": (4.124189801835784, -73.63458086014809),
+"Esquina inmobiliaria casa jerez": (4.118603057148483, -73.63120851669755),
+"Esquina de la drogueria de la calle 37-45": (4.119967122570697, -73.62883323937426),
+"Esquina panaderia la cosmopolita": (4.1191071446992, -73.62839373170144),
+"Esquina de la cra 28f": (4.1199259618918385, -73.62532986775233),
+
+Ruta 6: GRAMA
+
+"Cuatro PARQUES": (4.158244000108189, -73.64100075445164),
+"PICADAS Y ALGO MAS ": (4.157997, -73.637519),
+"Bomba texaco frente al monumento de coleo": (4.156834, -73.632429),
+"Aptos frente a la toyota": (4.1537204416645315, -73.62877935506586),
+"Drogueria providencia": (4.151189, -73.628539),
+"Monumento del coleeo": (4.15610629662814, -73.63159051009902),
+"Yamaha": (4.148268, -73.624446),
+"Cofrem": (4.147639994898113, -73.62091644480549),
+
+Ruta 7: PORFIA
+
+"ENTRADA DE LOS APTOS DE LA MADRID": (4.059298132752688, -73.6699827011692),
+"Entrada etapa 4 de la Madrid": (4.064776323187846, -73.67133424649228),
+"Almacen los chopos, Salida colegio las palmas": (4.07332179557843, -73.66952869303203),
+"Banco congente": (4.079077658984419, -73.66923000485352),
+"Consuerto Dig. Iglesia de porfia": (4.082624700862572, -73.6691345971296),
+"Bomba en rompoing de porfia": (4.088628093679213, -73.6700086239338),
+"Segundo puente peatonal saman de rivera": (4.0918404877067625, -73.66605539430769),
+
+Ruta 8: Montecarlo/Amarilo
+
+"GLORIETA ENTRADA A LA ROCHELA": (4.103383463009138, -73.65743915342253),
+"Rompoing Montecarlo": (4.104285, -73.656743),
+"Bomba terpel": (4.109281, -73.654484),
+"Puente peatonal Llano Lindo":(4.1227107, -73.6465539)
+"Entrada a catumare (frente Bomba Serramonte)": (4.115571, -73.648923),
+"Paradero servicio urbano Entrada apto amarillo": (4.109078, -73.632863)
+
+Ruta 9: Postobón
+"CENTRO COMERCIAL SINFONIA": (4.148242110430097, -73.62445364668285),
+"Entrada biblioteca cofrem": (4.147583075473335, -73.62100399043783),
+"Fresilandia": (4.141286970624865, -73.62116100986675),
+"Debajo del puente de Sikuani": (4.137205717503952, -73.62185886902752),
+"Paradero servicio público de los apartamentos del cantarrana": (4.134359041971904, -73.62329470097575),
+
+Ruta 10: Reliquia
+
+"PUESTO DE SALUD DE LA RELIQUIA": (4.132193406102781, -73.5489867343002),
+"Campanario": (4.132972109123578, -73.56518652520892),
+"Mega colegio san Antonio": (4.128104648390391, -73.56865668720049),
+"Paradero servicio publico de kirpas": (4.118323862225342, -73.58489415317285),
+"Lavadero 24 hras": (4.116351093994522, -73.59260362691673),
+"Pan rolo": (4.116239984047486, -73.59726759110157),
+
+Ruta 11: CENTRO
+"TODA LA CUADRA DE JUSTO Y BUENO DEL BARZAL": (4.146161349514457, -73.63671515736165),
+"Unicentro paradero buses públicos": (4.143104561764764, -73.63343286376),
+"Tecniguayas": (4.1386620385001684, -73.63018351627187),
+"Frente al colegio industrial": (4.135204411621969, -73.6275130983564),
+"paradero de buses Makro": (4.128760413534249, -73.62265197449584),
+"salida a la alborada paradero": (4.124544685842803, -73.61937968689689),
+"cooperativa": (4.1154675310889575, -73.609457719232),
+"bomba primax": (4.110705622642267, -73.6035405540598),
+"Entrada Barcelona": (4.089668289826923, -73.57726428261499),
+
+
+
+

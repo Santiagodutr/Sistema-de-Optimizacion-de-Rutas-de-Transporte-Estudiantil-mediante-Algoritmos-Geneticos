@@ -1,0 +1,188 @@
+{
+  "universidad": {
+    "nombre": "Universidad de los Llanos",
+    "direccion": "Universidad de los Llanos, Villavicencio, Colombia",
+    "coordenadas": null
+  },
+  "rutas": [
+    {
+      "id": 1,
+      "nombre": "COVISAN",
+      "punto_recogida_principal": "Frente a Droguería Estero 24 HRS",
+      "paraderos": [
+        "Universidad de los Llanos, Villavicencio, Colombia",
+        "Bomba de Covisan, Villavicencio, Colombia",
+        "Parqueadero frente apto del salitre, Villavicencio, Colombia",
+        "Apto amarillo vía Campusano, Villavicencio, Colombia",
+        "Badeco tienda Campusano, Villavicencio, Colombia",
+        "Entrada mega colegio San Antonio, Villavicencio, Colombia"
+      ],
+      "horarios_recogida": ["5:10 AM", "6:10 AM", "7:10 AM", "8:20 AM"],
+      "horarios_regreso": ["11:00 AM", "12:00 PM", "4:00 PM", "5:00 PM", "6:10 PM"],
+      "punto_salida_unillanos": "Frente a la Piscina"
+    },
+    {
+      "id": 2,
+      "nombre": "MARACOS",
+      "punto_recogida_principal": "Montallantas de la Bomba Av Maracos",
+      "paraderos": [
+        "Universidad de los Llanos, Villavicencio, Colombia",
+        "Panadería frente al lavadero estero, Villavicencio, Colombia",
+        "Terminal de Transporte, Villavicencio, Colombia",
+        "Montallantas alto el pinilla, Villavicencio, Colombia",
+        "Lavadero 24 hrs Maracos, Villavicencio, Colombia"
+      ],
+      "horarios_recogida": ["5:10 AM", "6:10 AM", "7:10 AM", "8:20 AM"],
+      "horarios_regreso": ["11:00 AM", "12:00 PM"],
+      "punto_salida_unillanos": "Frente a la Piscina"
+    },
+    {
+      "id": 3,
+      "nombre": "TERMINAL",
+      "punto_recogida_principal": "Frente al Banco W de Hato Grande",
+      "paraderos": [
+        "Universidad de los Llanos, Villavicencio, Colombia",
+        "Puesto de salud frente a la Olímpica, Villavicencio, Colombia",
+        "Semáforo del Manistal, Villavicencio, Colombia",
+        "Semáforo de la Morgue, Villavicencio, Colombia",
+        "Motores Kumbi, Villavicencio, Colombia",
+        "Colanta Villavicencio, Colombia",
+        "Semáforo de los aptos Cerro Campestre, Villavicencio, Colombia"
+      ],
+      "horarios_recogida": ["5:20 AM", "6:20 AM", "7:20 AM", "8:20 AM"],
+      "horarios_regreso": ["11:00 AM", "12:00 PM", "4:00 PM", "5:00 PM", "6:10 PM"],
+      "punto_salida_unillanos": "Frente a la Piscina"
+    },
+    {
+      "id": 4,
+      "nombre": "VILLACENTRO",
+      "punto_recogida_principal": "Portería Principal CC Villacentro",
+      "paraderos": [
+        "Universidad de los Llanos, Villavicencio, Colombia",
+        "Centro Comercial Villacentro, Villavicencio, Colombia",
+        "Mazorcadas frente al edificio de la Fiscalía, Villavicencio, Colombia",
+        "Pizzería Dominos Villavicencio, Colombia",
+        "Droguería La Rebaja Villavicencio, Colombia"
+      ],
+      "horarios_recogida": ["5:20 AM", "6:20 AM", "7:20 AM", "8:20 AM"],
+      "horarios_regreso": ["11:00 AM", "12:00 PM", "4:00 PM", "5:00 PM", "6:10 PM"],
+      "punto_salida_unillanos": "Frente a la Piscina"
+    },
+    {
+      "id": 5,
+      "nombre": "VIVA",
+      "punto_recogida_principal": "Semáforo CC Viva, Vía Villabolívar",
+      "paraderos": [
+        "Universidad de los Llanos, Villavicencio, Colombia",
+        "Centro Comercial Viva Villavicencio, Colombia",
+        "Boutique Revival Villavicencio, Colombia",
+        "Inmobiliaria Casa Jerez, Villavicencio, Colombia",
+        "Droguería Calle 37, Villavicencio, Colombia",
+        "Panadería La Cosmopolita, Villavicencio, Colombia"
+      ],
+      "horarios_recogida": ["5:20 AM", "6:20 AM", "7:20 AM", "8:20 AM"],
+      "horarios_regreso": ["11:00 AM", "12:00 PM", "4:00 PM", "5:00 PM", "6:10 PM"],
+      "punto_salida_unillanos": "Diagonal Clínica Veterinaria"
+    },
+    {
+      "id": 6,
+      "nombre": "GRAMA",
+      "punto_recogida_principal": "Picadas y Algo Más (4 Parques)",
+      "paraderos": [
+        "Universidad de los Llanos, Villavicencio, Colombia",
+        "Picadas y Algo Más, Villavicencio, Colombia",
+        "Bomba Texaco frente al Monumento de Colao, Villavicencio, Colombia",
+        "Aptos frente a la Toyota, Villavicencio, Colombia",
+        "Droguería Providencia, Villavicencio, Colombia",
+        "Monumento del Colegio Yamaha, Villavicencio, Colombia"
+      ],
+      "horarios_recogida": ["5:20 AM", "6:20 AM", "7:20 AM"],
+      "horarios_regreso": ["11:00 AM", "12:00 PM", "4:00 PM", "5:00 PM", "6:10 PM"],
+      "punto_salida_unillanos": "Frente a la Piscina"
+    },
+    {
+      "id": 7,
+      "nombre": "PORFIA",
+      "punto_recogida_principal": "Entrada de los Aptos de La Madrid",
+      "paraderos": [
+        "Universidad de los Llanos, Villavicencio, Colombia",
+        "Entrada Etapa 4 La Madrid, Villavicencio, Colombia",
+        "Almacén Los Chopos, Villavicencio, Colombia",
+        "Colegio Las Palmas, Villavicencio, Colombia",
+        "Banco Conguerto, Villavicencio, Colombia",
+        "Iglesia de Porfía, Villavicencio, Colombia",
+        "Bomba Camping de Porfía, Villavicencio, Colombia"
+      ],
+      "horarios_recogida": ["5:10 AM", "7:10 AM", "8:20 AM"],
+      "horarios_regreso": ["12:00 PM", "5:00 PM", "6:10 PM"],
+      "punto_salida_unillanos": "Frente a Clínica Veterinaria"
+    },
+    {
+      "id": 8,
+      "nombre": "MONTECARLO/AMARILLO",
+      "punto_recogida_principal": "Glorieta Entrada a La Rochela",
+      "paraderos": [
+        "Universidad de los Llanos, Villavicencio, Colombia",
+        "Rompoing Montecarlo, Villavicencio, Colombia",
+        "Bomba Terpal, Villavicencio, Colombia",
+        "Entrada a Cucumare, Villavicencio, Colombia",
+        "Paradero Servicio Urbano, Villavicencio, Colombia",
+        "Entrada Apto Amarillo, Villavicencio, Colombia"
+      ],
+      "horarios_recogida": ["5:20 AM", "6:20 AM", "7:20 AM", "8:20 AM"],
+      "horarios_regreso": ["11:00 AM", "12:00 PM", "4:00 PM", "5:00 PM", "6:10 PM"],
+      "punto_salida_unillanos": "Frente al Corral de Veterinaria"
+    },
+    {
+      "id": 9,
+      "nombre": "POSTOBON",
+      "punto_recogida_principal": "Centro Comercial Sinfonía",
+      "paraderos": [
+        "Universidad de los Llanos, Villavicencio, Colombia",
+        "Centro Comercial Sinfonía, Villavicencio, Colombia",
+        "Biblioteca Cofrem, Villavicencio, Colombia",
+        "Fresilandia, Villavicencio, Colombia",
+        "Colegio Cafam, Villavicencio, Colombia"
+      ],
+      "horarios_recogida": ["5:20 AM", "6:20 AM", "7:20 AM", "8:20 AM"],
+      "horarios_regreso": ["11:00 AM", "12:00 PM", "4:00 PM", "5:00 PM", "6:10 PM"],
+      "punto_salida_unillanos": "Frente a la Piscina"
+    },
+    {
+      "id": 10,
+      "nombre": "RELIQUIA",
+      "punto_recogida_principal": "Puesto de Salud de La Reliquia",
+      "paraderos": [
+        "Universidad de los Llanos, Villavicencio, Colombia",
+        "Puesto de Salud La Reliquia, Villavicencio, Colombia",
+        "Cinusanto, Villavicencio, Colombia",
+        "Mega Colegio San Antonio, Villavicencio, Colombia",
+        "Paradero Servicio Público Kopass, Villavicencio, Colombia",
+        "Lavadero 24 horas, Villavicencio, Colombia"
+      ],
+      "horarios_recogida": ["5:10 AM", "7:10 AM"],
+      "horarios_regreso": ["5:00 PM", "6:10 PM"],
+      "punto_salida_unillanos": "Frente a la Piscina"
+    },
+    {
+      "id": 11,
+      "nombre": "PARQUE",
+      "punto_recogida_principal": "Cuadra de Justo y Bueno del Barzal",
+      "paraderos": [
+        "Universidad de los Llanos, Villavicencio, Colombia",
+        "Unicentro Villavicencio, Colombia",
+        "Paradero Buses Públicos Unicentro, Villavicencio, Colombia",
+        "Tecnicayas Colegio Industrial, Villavicencio, Colombia",
+        "Paradero Makro, Villavicencio, Colombia",
+        "Alborada Villavicencio, Colombia",
+        "Cooperativa Villavicencio, Colombia",
+        "Bomba Primax, Villavicencio, Colombia",
+        "Barcelona Villavicencio, Colombia"
+      ],
+      "horarios_recogida": ["Cada 15-20 minutos desde 5:20 AM hasta 7:10 PM"],
+      "horarios_regreso": ["Cada 15-20 minutos"],
+      "punto_salida_unillanos": "Entrada Principal",
+      "nota": "Ruta especial con servicio continuo cada 15-20 minutos"
+    }
+  ]
+}
