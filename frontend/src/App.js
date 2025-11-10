@@ -4,6 +4,7 @@ import { Toaster, toast } from 'sonner';
 import { Bus, Map, Activity, Sparkles, Github } from 'lucide-react';
 import RouteSelector from './components/RouteSelector';
 import GeneticAlgorithmPanel from './components/GeneticAlgorithmPanel';
+import AlgorithmProcedurePanel from './components/AlgorithmProcedurePanel';
 import MapView from './components/MapView';
 import axios from 'axios';
 
@@ -92,6 +93,7 @@ function App() {
         <main className="max-w-[1600px] mx-auto px-6 py-6">
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
             
+            {/* Columna Izquierda: Selector y Panel GA */}
             <div className="xl:col-span-4 space-y-6">
               <RouteSelector
                 rutasDisponibles={rutasDisponibles}
@@ -109,11 +111,18 @@ function App() {
               )}
             </div>
 
-            <div className="xl:col-span-8">
+            {/* Columna Derecha: Mapa y Procedimiento */}
+            <div className="xl:col-span-8 space-y-6">
               <MapView
                 rutasOptimizadas={rutasOptimizadas}
                 cargando={cargando}
               />
+              
+              {rutasOptimizadas.length > 0 && (
+                <AlgorithmProcedurePanel
+                  ruta={rutasOptimizadas[0]}
+                />
+              )}
             </div>
           </div>
         </main>

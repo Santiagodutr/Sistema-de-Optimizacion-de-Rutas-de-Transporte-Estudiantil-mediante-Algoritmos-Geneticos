@@ -21,7 +21,7 @@ const MapView = ({ rutasOptimizadas, cargando }) => {
   ];
 
   return (
-    <Card className="shadow-lg border-slate-200 overflow-hidden h-[calc(100vh-200px)]">
+    <Card className="shadow-lg border-slate-200 overflow-hidden h-[500px]">
       {cargando ? (
         <div className="h-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
           <Loader2 className="w-12 h-12 text-blue-500 animate-spin mb-4" />
