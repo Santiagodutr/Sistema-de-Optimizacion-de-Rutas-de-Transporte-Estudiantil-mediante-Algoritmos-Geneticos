@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from data_loader import obtener_coordenadas, matriz_distancias_osm_con_geometria
 from rutas_loader import obtener_todas_las_rutas, crear_asignacion_buses_por_ruta
+from genetic_algorithm import algoritmo_genetico
 import numpy as np
 import traceback
 import json
@@ -127,39 +128,62 @@ def optimizar_rutas_reales():
                 cache_geometrias[matriz_key] = geometrias
                 print(f"   ✅ Matriz y geometrías calculadas (rutas siguen calles reales)")
             
-            # Calcular distancia total Y construir geometría completa de la ruta
-            distancia_total = 0
-            geometria_completa = []
+            # 🧬 OPTIMIZAR RUTA CON ALGORITMO GENÉTICO
+            print(f"   🧬 Optimizando orden de paradas con Algoritmo Genético...")
+            resultado_ga = algoritmo_genetico(
+                matriz_distancias=matriz,
+                punto_inicio_idx=0,  # Primer paradero
+                punto_fin_idx=len(coords) - 1,  # Último paradero (Universidad)
+                tamano_poblacion=100,
+                generaciones=200,
+                tasa_cruce=0.8,
+                tasa_mutacion=0.15,
+                elitismo=2,
+                verbose=True
+            )
             
-            for i in range(len(coords) - 1):
-                distancia_total += matriz[i][i + 1]
-                # Añadir geometría del segmento i -> i+1
-                if (i, i+1) in geometrias:
-                    segmento = geometrias[(i, i+1)]
+            # Obtener mejor ruta del algoritmo genético
+            orden_optimizado = resultado_ga['mejor_ruta']
+            distancia_total = resultado_ga['mejor_fitness']
+            
+            # Reordenar coordenadas y direcciones según el orden optimizado
+            coords_optimizadas = [coords[i] for i in orden_optimizado]
+            direcciones_optimizadas = [direcciones[i] for i in orden_optimizado]
+            
+            # Construir geometría completa de la ruta optimizada
+            geometria_completa = []
+            for i in range(len(orden_optimizado) - 1):
+                idx_origen = orden_optimizado[i]
+                idx_destino = orden_optimizado[i + 1]
+                
+                # Añadir geometría del segmento
+                if (idx_origen, idx_destino) in geometrias:
+                    segmento = geometrias[(idx_origen, idx_destino)]
                     if i == 0:
-                        # Primer segmento: añadir todos los puntos
                         geometria_completa.extend(segmento)
                     else:
-                        # Siguientes segmentos: omitir primer punto (ya está en la geometría)
                         geometria_completa.extend(segmento[1:])
             
-            # Si no hay geometría, usar coordenadas originales
+            # Si no hay geometría, usar coordenadas optimizadas
             if not geometria_completa:
-                geometria_completa = coords
+                geometria_completa = coords_optimizadas
             
-            # Preparar resultado
+            # Preparar resultado con ruta optimizada
             ruta_optimizada = {
                 "bus": f"Bus {ruta['id']} - {ruta['nombre']}",
                 "ruta_id": ruta['id'],
                 "nombre": ruta['nombre'],
-                "coordenadas": coords,
+                "coordenadas": coords_optimizadas,  # Coordenadas en orden optimizado
                 "geometria_completa": geometria_completa,  # Geometría real de las calles
-                "paraderos": direcciones,
+                "paraderos": direcciones_optimizadas,  # Direcciones en orden optimizado
                 "distancia_total_metros": float(distancia_total),
                 "distancia_total_km": round(float(distancia_total) / 1000, 2),
-                "numero_paradas": len(coords),
+                "numero_paradas": len(coords_optimizadas),
                 "horarios_recogida": ruta['horarios_recogida'],
-                "punto_salida": ruta['punto_salida_unillanos']
+                "punto_salida": ruta['punto_salida_unillanos'],
+                "orden_original": list(range(len(coords))),  # Para referencia
+                "orden_optimizado": orden_optimizado,  # Orden después de GA
+                "mejora_porcentual": None  # Se calculará si hay datos de comparación
             }
             
             rutas_optimizadas.append(ruta_optimizada)
