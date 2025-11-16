@@ -1,0 +1,109 @@
+@startuml Secuencia 4 - Geocodificación de Direcciones
+
+title Secuencia: Geocodificación de Direcciones
+
+participant "api_rutas_reales" as API
+participant "data_loader" as DataLoader
+participant "coordenadas_exactas" as CoordExactas
+participant "Nominatim\n(Geopy)" as Geopy
+participant "OpenStreetMap" as OSM
+
+API -> DataLoader: obtener_coordenadas(direcciones[])
+activate DataLoader
+
+DataLoader -> DataLoader: geolocator = Nominatim(\n  user_agent="unillanos_rutas",\n  timeout=10)
+DataLoader -> DataLoader: coords = []
+
+loop Para cada dirección en direcciones
+    
+    ' PASO 1: Buscar en coordenadas exactas
+    DataLoader -> CoordExactas: buscar_coordenada_exacta(direccion)
+    activate CoordExactas
+    
+    CoordExactas -> CoordExactas: direccion_lower = direccion.lower().strip()
+    
+    alt Búsqueda exacta
+        CoordExactas -> CoordExactas: if direccion_lower in COORDENADAS_EXACTAS
+        CoordExactas --> DataLoader: (lat, lon)
+    else Búsqueda parcial
+        CoordExactas -> CoordExactas: Buscar coincidencia parcial\nen claves del diccionario
+        
+        alt Encontrada
+            CoordExactas --> DataLoader: (lat, lon)
+        else No encontrada
+            CoordExactas --> DataLoader: None
+        end
+    end
+    deactivate CoordExactas
+    
+    alt Coordenada exacta encontrada
+        DataLoader -> DataLoader: coords.append(coord_exacta)
+        note right: ✅ Coordenada exacta\nNo necesita geocodificar
+    else No encontrada en BD local
+        
+        ' PASO 2: Geocodificar con OpenStreetMap
+        DataLoader -> Geopy: geolocator.geocode(direccion)
+        activate Geopy
+        
+        Geopy -> OSM: Buscar dirección
+        activate OSM
+        OSM --> Geopy: location / None
+        deactivate OSM
+        
+        Geopy --> DataLoader: loc
+        deactivate Geopy
+        
+        alt Geocodificación exitosa
+            DataLoader -> DataLoader: coords.append(\n  (loc.latitude, loc.longitude))
+            note right: ✅ Encontrado en OSM
+        else Geocodificación fallida
+            
+            ' PASO 3: Intentar variaciones
+            DataLoader -> DataLoader: partes = direccion.split(',')\ntermino_clave = partes[0].strip()
+            DataLoader -> DataLoader: direccion_simple =\n  f"{termino_clave}, Villavicencio, Meta, Colombia"
+            
+            DataLoader -> Geopy: geolocator.geocode(direccion_simple)
+            activate Geopy
+            Geopy -> OSM: Buscar dirección simplificada
+            activate OSM
+            OSM --> Geopy: location / None
+            deactivate OSM
+            Geopy --> DataLoader: loc
+            deactivate Geopy
+            
+            alt Variación exitosa
+                DataLoader -> DataLoader: coords.append(\n  (loc.latitude, loc.longitude))
+            else Aún fallida
+                
+                ' PASO 4: Último intento
+                DataLoader -> DataLoader: direccion_minima =\n  f"{termino_clave}, Villavicencio"
+                
+                DataLoader -> Geopy: geolocator.geocode(direccion_minima)
+                activate Geopy
+                Geopy -> OSM: Buscar dirección mínima
+                activate OSM
+                OSM --> Geopy: location / None
+                deactivate OSM
+                Geopy --> DataLoader: loc
+                deactivate Geopy
+                
+                alt Último intento exitoso
+                    DataLoader -> DataLoader: coords.append(\n  (loc.latitude, loc.longitude))
+                else Todo falló
+                    
+                    ' PASO 5: Fallback Universidad
+                    DataLoader -> DataLoader: coords.append(\n  (4.0743475, -73.5831012))
+                    note right: ⚠️ Fallback:\nUniversidad de los Llanos
+                end
+            end
+        end
+        
+        DataLoader -> DataLoader: time.sleep(1.5)
+        note right: Evita bloqueo del servidor OSM
+    end
+end
+
+DataLoader --> API: coords[]
+deactivate DataLoader
+
+@enduml

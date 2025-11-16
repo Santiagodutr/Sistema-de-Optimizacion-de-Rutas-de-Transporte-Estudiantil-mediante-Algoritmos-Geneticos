@@ -1,0 +1,35 @@
+@startuml Secuencia 2 - Obtener Información de Rutas
+
+title Secuencia: Obtener Información Básica de Rutas
+
+actor "Usuario/Frontend" as User
+participant "Flask App" as Flask
+participant "api_rutas_reales" as API
+participant "rutas_loader" as RutasLoader
+
+User -> Flask: GET /api/rutas/info
+activate Flask
+
+Flask -> API: obtener_info_rutas()
+activate API
+
+API -> RutasLoader: obtener_todas_las_rutas()
+activate RutasLoader
+
+RutasLoader -> RutasLoader: cargar_rutas_reales()
+note right: Lee rutas_reales.json
+
+RutasLoader --> API: lista de rutas
+deactivate RutasLoader
+
+loop Para cada ruta
+    API -> API: Crear diccionario info_ruta\ncon: id, nombre, punto_principal,\nnumero_paraderos, horarios_recogida
+end
+
+API --> Flask: jsonify({\n  "total_rutas": len(rutas),\n  "rutas": info_rutas\n})
+deactivate API
+
+Flask --> User: Response 200 OK con JSON
+deactivate Flask
+
+@enduml

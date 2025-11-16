@@ -1,0 +1,46 @@
+@startuml Secuencia 7 - Carga de Rutas desde JSON
+
+title Secuencia: Carga de Rutas Reales desde JSON
+
+participant "api_rutas_reales" as API
+participant "rutas_loader" as RutasLoader
+database "rutas_reales.json" as JSON
+
+API -> RutasLoader: obtener_todas_las_rutas()
+activate RutasLoader
+
+RutasLoader -> RutasLoader: cargar_rutas_reales()
+activate RutasLoader
+
+RutasLoader -> RutasLoader: ruta_archivo = os.path.join(\n  os.path.dirname(__file__),\n  'rutas_reales.json')
+
+RutasLoader -> JSON: open(ruta_archivo, 'r',\n  encoding='utf-8')
+activate JSON
+JSON --> RutasLoader: file handle
+deactivate JSON
+
+RutasLoader -> RutasLoader: json.load(f)
+RutasLoader --> RutasLoader: datos (dict)
+deactivate RutasLoader
+
+RutasLoader -> RutasLoader: return datos['rutas']
+
+RutasLoader --> API: lista de rutas
+deactivate RutasLoader
+
+note right of RutasLoader
+    **Estructura de datos['rutas']:**
+    [
+      {
+        'id': int,
+        'nombre': str,
+        'paraderos': [str],
+        'punto_recogida_principal': str,
+        'horarios_recogida': [str],
+        'punto_salida_unillanos': str
+      },
+      ...
+    ]
+end note
+
+@enduml

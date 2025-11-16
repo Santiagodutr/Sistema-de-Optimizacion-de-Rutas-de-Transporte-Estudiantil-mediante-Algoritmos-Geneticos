@@ -1,0 +1,196 @@
+@startuml Secuencia 3 - Optimizar Rutas Completo
+
+title Secuencia: Optimizar Rutas (Flujo Completo)
+
+actor "Usuario/Frontend" as User
+participant "Flask App" as Flask
+participant "api_rutas_reales" as API
+participant "rutas_loader" as RutasLoader
+participant "data_loader" as DataLoader
+participant "coordenadas_exactas" as CoordExactas
+participant "genetic_algorithm" as GA
+participant "fitness" as Fitness
+database "Cache Global" as Cache
+participant "OSMnx" as OSM
+
+User -> Flask: GET /api/rutas/optimizar\n?rutas_ids=1,2,3
+activate Flask
+
+Flask -> API: optimizar_rutas_reales()
+activate API
+
+' === PASO 1: Cargar Rutas ===
+API -> RutasLoader: obtener_todas_las_rutas()
+activate RutasLoader
+RutasLoader -> RutasLoader: cargar_rutas_reales()
+RutasLoader --> API: todas_las_rutas[]
+deactivate RutasLoader
+
+API -> API: Filtrar rutas según rutas_ids
+
+' === PASO 2: Procesar cada ruta ===
+loop Para cada ruta en rutas_reales
+    
+    ' === GEOCODIFICACIÓN ===
+    API -> API: Crear cache_key\ncon direcciones
+    
+    alt Coordenadas en caché
+        API -> Cache: Buscar en cache_coordenadas
+        Cache --> API: coords[]
+    else Coordenadas NO en caché
+        API -> DataLoader: obtener_coordenadas(direcciones)
+        activate DataLoader
+        
+        loop Para cada dirección
+            DataLoader -> CoordExactas: buscar_coordenada_exacta(direccion)
+            activate CoordExactas
+            
+            alt Coordenada exacta encontrada
+                CoordExactas --> DataLoader: (lat, lon)
+            else No encontrada
+                CoordExactas --> DataLoader: None
+                DataLoader -> OSM: geolocator.geocode(direccion)
+                activate OSM
+                OSM --> DataLoader: location
+                deactivate OSM
+            end
+            deactivate CoordExactas
+        end
+        
+        DataLoader --> API: coords[]
+        deactivate DataLoader
+        API -> Cache: Guardar en cache_coordenadas
+    end
+    
+    ' === CÁLCULO DE MATRIZ DE DISTANCIAS ===
+    API -> API: Crear matriz_key
+    
+    alt Matriz en caché
+        API -> Cache: Buscar en cache_matrices\ny cache_geometrias
+        Cache --> API: matriz, geometrias
+    else Matriz NO en caché
+        API -> DataLoader: matriz_distancias_osm_con_geometria(coords)
+        activate DataLoader
+        
+        DataLoader -> OSM: ox.graph_from_point()\n(descarga red vial)
+        activate OSM
+        OSM --> DataLoader: G (grafo de calles)
+        deactivate OSM
+        
+        DataLoader -> DataLoader: Crear matriz vacía\ny diccionario geometrias{}
+        
+        loop Para cada par (i,j)
+            DataLoader -> OSM: ox.distance.nearest_nodes(G, lon, lat)
+            activate OSM
+            OSM --> DataLoader: nodo_i, nodo_j
+            deactivate OSM
+            
+            DataLoader -> OSM: ox.shortest_path(G, nodo_i, nodo_j)
+            activate OSM
+            OSM --> DataLoader: ruta[]
+            deactivate OSM
+            
+            DataLoader -> OSM: ox.routing.route_to_gdf(G, ruta)
+            activate OSM
+            OSM --> DataLoader: gdf con distancias
+            deactivate OSM
+            
+            DataLoader -> DataLoader: Calcular distancia total\nExtraer geometría (lat,lon)
+            DataLoader -> DataLoader: matriz[i][j] = distancia\ngeometrias[(i,j)] = coords
+        end
+        
+        DataLoader --> API: (matriz, geometrias)
+        deactivate DataLoader
+        
+        API -> Cache: Guardar en cache_matrices\ny cache_geometrias
+    end
+    
+    ' === ALGORITMO GENÉTICO ===
+    API -> GA: algoritmo_genetico(\n  matriz_distancias,\n  punto_inicio_idx=0,\n  punto_fin_idx=len(coords)-1,\n  tamano_poblacion=100,\n  generaciones=200,\n  tasa_cruce=0.8,\n  tasa_mutacion=0.15,\n  elitismo=2,\n  verbose=True\n)
+    activate GA
+    
+    GA -> GA: crear_poblacion(tamano_poblacion,\n  n_paradas, punto_inicio_idx,\n  punto_fin_idx)
+    
+    loop Para cada individuo
+        GA -> GA: crear_individuo(n_paradas,\n  punto_inicio_idx, punto_fin_idx)
+        note right: Permuta paradas intermedias\nMantiene inicio y fin fijos
+    end
+    
+    GA -> GA: Inicializar mejor_global\ny historial_fitness[]
+    
+    loop Para cada generación (200)
+        
+        ' Evaluar fitness
+        GA -> Fitness: evaluar_poblacion(poblacion,\n  matriz_distancias)
+        activate Fitness
+        
+        loop Para cada individuo
+            Fitness -> Fitness: calcular_fitness(individuo,\n  matriz_distancias)
+            note right: Suma distancias\nentre paradas consecutivas
+        end
+        
+        Fitness --> GA: fitness_poblacion[]
+        deactivate Fitness
+        
+        GA -> GA: Encontrar mejor de generación\nActualizar mejor_global
+        GA -> GA: historial_fitness.append(mejor_fitness)
+        
+        ' Crear nueva población
+        GA -> GA: nueva_poblacion = []
+        
+        ' Elitismo
+        GA -> GA: Preservar mejores individuos\n(elitismo=2)
+        
+        loop Hasta completar población
+            ' Selección
+            GA -> GA: padre1 = seleccion_torneo(\n  poblacion, fitness_poblacion, k=3)
+            GA -> GA: padre2 = seleccion_torneo(\n  poblacion, fitness_poblacion, k=3)
+            
+            ' Cruce
+            alt random.random() < tasa_cruce (0.8)
+                GA -> GA: hijo1, hijo2 = cruce_pmx(\n  padre1, padre2)
+                note right: Partially Mapped Crossover\nMantiene primer y último fijos
+            else
+                GA -> GA: hijo1, hijo2 = copias de padres
+            end
+            
+            ' Mutación
+            GA -> GA: hijo1 = mutacion_intercambio(\n  hijo1, tasa_mutacion=0.15)
+            note right: Intercambia 2 paradas\nintermedias aleatoriamente
+            
+            GA -> GA: hijo2 = mutacion_intercambio(\n  hijo2, tasa_mutacion=0.15)
+            
+            GA -> GA: Agregar hijos a nueva_poblacion
+        end
+        
+        GA -> GA: poblacion = nueva_poblacion
+    end
+    
+    ' Evaluación final
+    GA -> Fitness: evaluar_poblacion(poblacion,\n  matriz_distancias)
+    activate Fitness
+    Fitness --> GA: fitness_poblacion[]
+    deactivate Fitness
+    
+    GA -> GA: Actualizar mejor_global si mejoró
+    
+    GA --> API: {\n  'mejor_ruta': mejor_global,\n  'mejor_fitness': mejor_fitness_global,\n  'historial_fitness': historial_fitness\n}
+    deactivate GA
+    
+    ' === CONSTRUIR RESPUESTA ===
+    API -> API: Reordenar coords y direcciones\nsegún orden_optimizado
+    API -> API: Construir geometria_completa\nusando geometrias[(i,j)]
+    API -> API: Crear ruta_optimizada dict\ncon todos los datos
+    API -> API: rutas_optimizadas.append(ruta_optimizada)
+end
+
+' === CALCULAR ESTADÍSTICAS ===
+API -> API: Calcular distancia_total_sistema\ny promedio_distancia
+
+API --> Flask: jsonify({\n  "rutas": rutas_optimizadas[],\n  "estadisticas": {...}\n})
+deactivate API
+
+Flask --> User: Response 200 OK\ncon rutas optimizadas
+deactivate Flask
+
+@enduml

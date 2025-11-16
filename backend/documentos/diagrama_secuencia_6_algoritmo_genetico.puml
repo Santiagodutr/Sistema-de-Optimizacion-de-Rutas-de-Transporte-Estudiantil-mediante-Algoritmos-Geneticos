@@ -1,0 +1,201 @@
+@startuml Secuencia 6 - Algoritmo Genético Detallado
+
+title Secuencia: Algoritmo Genético - Optimización de Ruta
+
+participant "api_rutas_reales" as API
+participant "genetic_algorithm" as GA
+participant "fitness" as Fitness
+
+API -> GA: algoritmo_genetico(\n  matriz_distancias,\n  punto_inicio_idx=0,\n  punto_fin_idx=None,\n  tamano_poblacion=100,\n  generaciones=200,\n  tasa_cruce=0.8,\n  tasa_mutacion=0.15,\n  elitismo=2,\n  verbose=True)
+activate GA
+
+GA -> GA: n_paradas = matriz_distancias.shape[0]
+GA -> GA: if punto_fin_idx is None:\n  punto_fin_idx = n_paradas - 1
+
+' === PASO 1: Crear población inicial ===
+GA -> GA: crear_poblacion(tamano_poblacion,\n  n_paradas, punto_inicio_idx,\n  punto_fin_idx)
+activate GA
+
+loop Para _ in range(tamano_poblacion) (100)
+    GA -> GA: crear_individuo(n_paradas,\n  punto_inicio_idx, punto_fin_idx)
+    activate GA
+    
+    GA -> GA: paradas_intermedias = list(range(n_paradas))
+    GA -> GA: paradas_intermedias.remove(punto_inicio_idx)
+    GA -> GA: paradas_intermedias.remove(punto_fin_idx)
+    GA -> GA: random.shuffle(paradas_intermedias)
+    GA -> GA: ruta = [punto_inicio_idx] +\n  paradas_intermedias +\n  [punto_fin_idx]
+    
+    GA --> GA: ruta[]
+    deactivate GA
+end
+
+GA --> GA: poblacion[]
+deactivate GA
+
+GA -> GA: historial_fitness = []
+GA -> GA: mejor_global = None
+GA -> GA: mejor_fitness_global = inf
+
+' === PASO 2: Evolución ===
+loop Para generacion in range(generaciones) (200)
+    
+    ' === EVALUACIÓN ===
+    GA -> Fitness: evaluar_poblacion(poblacion,\n  matriz_distancias)
+    activate Fitness
+    
+    loop Para cada individuo in poblacion
+        Fitness -> Fitness: calcular_fitness(individuo,\n  matriz_distancias)
+        activate Fitness
+        
+        Fitness -> Fitness: distancia_total = 0.0
+        
+        loop Para i in range(len(ruta) - 1)
+            Fitness -> Fitness: origen = ruta[i]\ndestino = ruta[i+1]
+            Fitness -> Fitness: distancia_total +=\n  matriz_distancias[origen][destino]
+        end
+        
+        Fitness --> Fitness: distancia_total
+        deactivate Fitness
+    end
+    
+    Fitness --> GA: fitness_poblacion[]
+    deactivate Fitness
+    
+    ' === ACTUALIZAR MEJOR ===
+    GA -> GA: mejor_idx = np.argmin(fitness_poblacion)
+    GA -> GA: mejor_fitness = fitness_poblacion[mejor_idx]
+    GA -> GA: historial_fitness.append(mejor_fitness)
+    
+    alt mejor_fitness < mejor_fitness_global
+        GA -> GA: mejor_fitness_global = mejor_fitness
+        GA -> GA: mejor_global = poblacion[mejor_idx].copy()
+    end
+    
+    alt generacion % 20 == 0 and verbose
+        GA -> GA: print(f"Gen {generacion}: Mejor fitness = {mejor_fitness:.2f} m")
+    end
+    
+    ' === CREAR NUEVA POBLACIÓN ===
+    GA -> GA: nueva_poblacion = []
+    
+    ' === ELITISMO ===
+    GA -> GA: indices_elite = np.argsort(fitness_poblacion)[:elitismo]
+    
+    loop Para idx in indices_elite (2 mejores)
+        GA -> GA: nueva_poblacion.append(\n  poblacion[idx].copy())
+    end
+    
+    ' === GENERAR RESTO ===
+    loop while len(nueva_poblacion) < tamano_poblacion
+        
+        ' === SELECCIÓN POR TORNEO ===
+        GA -> GA: seleccion_torneo(poblacion,\n  fitness_poblacion, k=3)
+        activate GA
+        GA -> GA: indices = random.sample(\n  range(len(poblacion)), k)
+        GA -> GA: mejor_idx = min(indices,\n  key=lambda i: fitness_poblacion[i])
+        GA --> GA: padre1 = poblacion[mejor_idx].copy()
+        deactivate GA
+        
+        GA -> GA: seleccion_torneo(poblacion,\n  fitness_poblacion, k=3)
+        activate GA
+        GA -> GA: indices = random.sample(\n  range(len(poblacion)), k)
+        GA -> GA: mejor_idx = min(indices,\n  key=lambda i: fitness_poblacion[i])
+        GA --> GA: padre2 = poblacion[mejor_idx].copy()
+        deactivate GA
+        
+        ' === CRUCE PMX ===
+        alt random.random() < tasa_cruce (0.8)
+            GA -> GA: cruce_pmx(padre1, padre2)
+            activate GA
+            
+            GA -> GA: inicio = padre1[0]\nfin = padre1[-1]
+            GA -> GA: p1_intermedio = padre1[1:-1]\np2_intermedio = padre2[1:-1]
+            
+            alt len(p1_intermedio) >= 2
+                GA -> GA: punto1 = random.randint(0, size_intermedio-1)
+                GA -> GA: punto2 = random.randint(punto1+1, size_intermedio)
+                
+                GA -> GA: hijo1_intermedio = [None] * size_intermedio\nhijo2_intermedio = [None] * size_intermedio
+                
+                GA -> GA: hijo1_intermedio[punto1:punto2] =\n  p2_intermedio[punto1:punto2]
+                GA -> GA: hijo2_intermedio[punto1:punto2] =\n  p1_intermedio[punto1:punto2]
+                
+                ' Llenar resto con mapeo
+                GA -> GA: llenar_hijo(hijo1_intermedio,\n  p1_intermedio, p2_intermedio)
+                GA -> GA: llenar_hijo(hijo2_intermedio,\n  p2_intermedio, p1_intermedio)
+                
+                GA -> GA: hijo1 = [inicio] + hijo1_intermedio + [fin]
+                GA -> GA: hijo2 = [inicio] + hijo2_intermedio + [fin]
+            else
+                GA -> GA: hijo1 = padre1.copy()\nhijo2 = padre2.copy()
+            end
+            
+            GA --> GA: hijo1, hijo2
+            deactivate GA
+        else
+            GA -> GA: hijo1 = padre1.copy()\nhijo2 = padre2.copy()
+        end
+        
+        ' === MUTACIÓN ===
+        GA -> GA: mutacion_intercambio(hijo1,\n  tasa_mutacion=0.15)
+        activate GA
+        
+        alt random.random() < tasa_mutacion
+            alt len(individuo) > 3
+                GA -> GA: idx1 = random.randint(1, len(individuo)-2)
+                GA -> GA: idx2 = random.randint(1, len(individuo)-2)
+                GA -> GA: individuo[idx1], individuo[idx2] =\n  individuo[idx2], individuo[idx1]
+            end
+        end
+        
+        GA --> GA: hijo1 (mutado)
+        deactivate GA
+        
+        GA -> GA: mutacion_intercambio(hijo2,\n  tasa_mutacion=0.15)
+        activate GA
+        
+        alt random.random() < tasa_mutacion
+            alt len(individuo) > 3
+                GA -> GA: idx1 = random.randint(1, len(individuo)-2)
+                GA -> GA: idx2 = random.randint(1, len(individuo)-2)
+                GA -> GA: individuo[idx1], individuo[idx2] =\n  individuo[idx2], individuo[idx1]
+            end
+        end
+        
+        GA --> GA: hijo2 (mutado)
+        deactivate GA
+        
+        ' === AGREGAR A NUEVA POBLACIÓN ===
+        GA -> GA: nueva_poblacion.append(hijo1)
+        
+        alt len(nueva_poblacion) < tamano_poblacion
+            GA -> GA: nueva_poblacion.append(hijo2)
+        end
+    end
+    
+    GA -> GA: poblacion = nueva_poblacion
+end
+
+' === EVALUACIÓN FINAL ===
+GA -> Fitness: evaluar_poblacion(poblacion,\n  matriz_distancias)
+activate Fitness
+Fitness --> GA: fitness_poblacion[]
+deactivate Fitness
+
+GA -> GA: mejor_idx = np.argmin(fitness_poblacion)
+
+alt fitness_poblacion[mejor_idx] < mejor_fitness_global
+    GA -> GA: mejor_global = poblacion[mejor_idx].copy()
+    GA -> GA: mejor_fitness_global =\n  fitness_poblacion[mejor_idx]
+end
+
+alt verbose
+    GA -> GA: print("✅ Algoritmo genético finalizado")
+    GA -> GA: print(f"📊 Mejor fitness: {mejor_fitness_global:.2f} m")
+end
+
+GA --> API: {\n  'mejor_ruta': mejor_global,\n  'mejor_fitness': mejor_fitness_global,\n  'historial_fitness': historial_fitness\n}
+deactivate GA
+
+@enduml

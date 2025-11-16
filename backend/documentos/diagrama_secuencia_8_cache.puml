@@ -1,0 +1,103 @@
+@startuml Secuencia 8 - Uso de Caché
+
+title Secuencia: Sistema de Caché (Coordenadas, Matrices y Geometrías)
+
+participant "api_rutas_reales" as API
+database "cache_coordenadas\n(dict global)" as CacheCoords
+database "cache_matrices\n(dict global)" as CacheMatrix
+database "cache_geometrias\n(dict global)" as CacheGeom
+participant "data_loader" as DataLoader
+
+' === ESCENARIO 1: Primera optimización (sin caché) ===
+API -> API: direcciones = ruta['paraderos']
+API -> API: cache_key = json.dumps(\n  sorted(direcciones))
+
+API -> CacheCoords: Buscar cache_key
+activate CacheCoords
+CacheCoords --> API: KeyError (no existe)
+deactivate CacheCoords
+
+note right of API: Primera vez - no hay caché
+
+API -> DataLoader: obtener_coordenadas(direcciones)
+activate DataLoader
+DataLoader --> API: coords[]
+deactivate DataLoader
+
+API -> CacheCoords: cache_coordenadas[cache_key] = coords
+activate CacheCoords
+deactivate CacheCoords
+
+API -> API: matriz_key = str(coords)
+
+API -> CacheMatrix: Buscar matriz_key
+activate CacheMatrix
+CacheMatrix --> API: KeyError (no existe)
+deactivate CacheMatrix
+
+API -> CacheGeom: Buscar matriz_key
+activate CacheGeom
+CacheGeom --> API: KeyError (no existe)
+deactivate CacheGeom
+
+API -> DataLoader: matriz_distancias_osm_con_geometria(coords)
+activate DataLoader
+note right: Proceso costoso\n~30-60 segundos
+DataLoader --> API: (matriz, geometrias)
+deactivate DataLoader
+
+API -> CacheMatrix: cache_matrices[matriz_key] = matriz
+activate CacheMatrix
+deactivate CacheMatrix
+
+API -> CacheGeom: cache_geometrias[matriz_key] = geometrias
+activate CacheGeom
+deactivate CacheGeom
+
+note right of API: ✅ Caché poblado para\nfuturas consultas
+
+' === ESCENARIO 2: Segunda optimización (con caché) ===
+API -> API: [Segunda llamada con\nmismas direcciones]
+
+API -> API: cache_key = json.dumps(\n  sorted(direcciones))
+
+API -> CacheCoords: Buscar cache_key
+activate CacheCoords
+CacheCoords --> API: coords[] ✅
+deactivate CacheCoords
+
+note right of API: ✅ Coordenadas desde caché\n(ahorro geocodificación)
+
+API -> API: matriz_key = str(coords)
+
+API -> CacheMatrix: Buscar matriz_key
+activate CacheMatrix
+CacheMatrix --> API: matriz ✅
+deactivate CacheMatrix
+
+API -> CacheGeom: Buscar matriz_key
+activate CacheGeom
+CacheGeom --> API: geometrias ✅
+deactivate CacheGeom
+
+note right of API: ✅ Matriz y geometrías desde caché\n(ahorro ~30-60 segundos)
+
+API -> API: Continuar con algoritmo genético\nusando datos del caché
+
+note over API
+    **Beneficios del caché:**
+    
+    1. **Primera optimización:** ~60-90 segundos
+       - Geocodificación: ~20-30 seg
+       - Matriz OSM: ~30-60 seg
+       - Algoritmo genético: ~10-20 seg
+    
+    2. **Optimizaciones subsecuentes:** ~10-20 segundos
+       - Geocodificación: 0 seg (caché)
+       - Matriz OSM: 0 seg (caché)
+       - Algoritmo genético: ~10-20 seg
+    
+    **Ahorro:** 70-80% del tiempo
+end note
+
+@enduml

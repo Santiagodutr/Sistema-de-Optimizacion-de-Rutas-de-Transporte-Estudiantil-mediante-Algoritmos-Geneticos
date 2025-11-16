@@ -1,0 +1,107 @@
+@startuml Flujo Frontend - Optimización de Rutas
+
+title Diagrama de Flujo - Frontend del Sistema de Optimización de Rutas
+
+start
+:Usuario abre la aplicación;
+
+:Sistema carga rutas disponibles
+GET /api/rutas/info;
+
+:Usuario ve lista de rutas;
+
+if (¿Selecciona una ruta?) then (Sí)
+  
+  :Usuario selecciona ruta
+  del dropdown;
+  
+  :Sistema muestra información
+  de la ruta (nombre, paradas);
+  
+  :Usuario hace clic en
+  "Optimizar Ruta";
+  
+  :Sistema muestra estado
+  "Cargando...";
+  
+  :Sistema envía petición
+  GET /api/rutas/optimizar?rutas_ids=X;
+  
+  :Sistema muestra animación
+  de carga en mapa;
+  
+  note right
+    **El backend procesa:**
+    • Geocodificación
+    • Matriz de distancias
+    • Algoritmo genético
+    • ~30-60 segundos
+  end note
+  
+  if (¿Respuesta exitosa?) then (Sí)
+    
+    :Sistema recibe rutas
+    optimizadas + estadísticas;
+    
+    :Sistema actualiza estado
+    React (rutasOptimizadas);
+    
+    :Sistema renderiza componentes;
+    
+    :MapView: Mostrar mapa Leaflet,
+    Dibujar Polyline (geometría),
+    Colocar Markers (paradas);
+    
+    :GeneticAlgorithmPanel: Mostrar distancia total,
+    número de paradas, parámetros GA;
+    
+    :AlgorithmProcedurePanel: Mostrar procedimiento,
+    paradas ordenadas, horarios;
+    
+    :Usuario ve resultados en el mapa;
+    
+    :Usuario ve ruta optimizada
+    (línea siguiendo calles);
+    
+    :Usuario ve paradas ordenadas
+    con marcadores;
+    
+    :Usuario ve estadísticas:
+    Distancia total (km),
+    Número de paradas,
+    Orden optimizado;
+    
+    :Usuario revisa panel
+    de procedimiento;
+    
+    if (¿Optimizar otra ruta?) then (Sí)
+      :Usuario selecciona nueva ruta;
+      stop
+    else (No)
+      :Usuario analiza resultados;
+      stop
+    endif
+    
+  else (Error)
+    :Sistema muestra toast de error;
+    
+    :Sistema mantiene última vista válida;
+    
+    if (¿Usuario reintenta?) then (Sí)
+      stop
+    else (No)
+      stop
+    endif
+  endif
+  
+else (No)
+  :Usuario ve mensaje
+  "Selecciona una Ruta";
+  
+  :Usuario ve mapa vacío
+  centrado en Villavicencio;
+  
+  stop
+endif
+
+@enduml

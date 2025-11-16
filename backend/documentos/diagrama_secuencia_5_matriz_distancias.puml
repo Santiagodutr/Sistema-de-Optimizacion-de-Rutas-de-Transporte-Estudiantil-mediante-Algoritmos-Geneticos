@@ -1,0 +1,110 @@
+@startuml Secuencia 5 - Cálculo de Matriz de Distancias con OSM
+
+title Secuencia: Cálculo de Matriz de Distancias y Geometría con OSM
+
+participant "api_rutas_reales" as API
+participant "data_loader" as DataLoader
+participant "OSMnx" as OSM
+
+API -> DataLoader: matriz_distancias_osm_con_geometria(coordenadas)
+activate DataLoader
+
+' === PASO 1: Calcular centro del área ===
+DataLoader -> DataLoader: lat_mean = np.mean([c[0] for c in coordenadas])
+DataLoader -> DataLoader: lon_mean = np.mean([c[1] for c in coordenadas])
+
+' === PASO 2: Descargar red vial ===
+DataLoader -> OSM: ox.graph_from_point(\n  (lat_mean, lon_mean),\n  dist=15000,\n  network_type='drive')
+activate OSM
+note right: Radio 15 km para cubrir\nVillavicencio
+
+alt Descarga exitosa
+    OSM --> DataLoader: G (grafo de red vial)
+else Error en descarga
+    OSM --> DataLoader: Exception
+    DataLoader -> OSM: ox.graph_from_point(\n  (lat_mean, lon_mean),\n  dist=10000,\n  network_type='drive')
+    note right: Reintento con 10 km
+    OSM --> DataLoader: G (grafo)
+end
+deactivate OSM
+
+' === PASO 3: Encontrar nodos más cercanos ===
+DataLoader -> DataLoader: nodos = []
+
+loop Para cada (lat, lon) en coordenadas
+    DataLoader -> OSM: ox.distance.nearest_nodes(G, lon, lat)
+    activate OSM
+    OSM --> DataLoader: nodo_id
+    deactivate OSM
+    DataLoader -> DataLoader: nodos.append(nodo_id)
+end
+
+' === PASO 4: Inicializar estructuras ===
+DataLoader -> DataLoader: n = len(nodos)
+DataLoader -> DataLoader: matriz = np.zeros((n, n))
+DataLoader -> DataLoader: geometrias = {}
+
+' === PASO 5: Calcular distancias y geometrías ===
+loop Para i en range(n)
+    loop Para j en range(n)
+        
+        alt i != j
+            DataLoader -> OSM: ox.shortest_path(G,\n  nodos[i], nodos[j],\n  weight='length')
+            activate OSM
+            
+            alt Ruta encontrada
+                OSM --> DataLoader: ruta[] (lista de nodos)
+                
+                ' Calcular distancia real
+                DataLoader -> OSM: ox.routing.route_to_gdf(\n  G, ruta, weight='length')
+                OSM --> DataLoader: gdf (GeoDataFrame)
+                deactivate OSM
+                
+                DataLoader -> DataLoader: distancia = gdf['length'].sum()
+                DataLoader -> DataLoader: matriz[i][j] = distancia
+                
+                ' Extraer geometría
+                DataLoader -> DataLoader: ruta_coords = []\nfor node in ruta:\n  lat = G.nodes[node]['y']\n  lon = G.nodes[node]['x']\n  ruta_coords.append((lat, lon))
+                
+                DataLoader -> DataLoader: geometrias[(i,j)] = ruta_coords
+                
+            else Sin ruta (no conectado)
+                OSM --> DataLoader: None
+                deactivate OSM
+                
+                ' Fallback: distancia euclidiana
+                DataLoader -> DataLoader: lat1, lon1 = coordenadas[i]\nlat2, lon2 = coordenadas[j]
+                
+                DataLoader -> OSM: ox.distance.great_circle(\n  lat1, lon1, lat2, lon2)
+                activate OSM
+                OSM --> DataLoader: dist_euclidiana
+                deactivate OSM
+                
+                DataLoader -> DataLoader: matriz[i][j] = dist_euclidiana * 1.3
+                note right: Factor 1.3 para\ntortuosidad de calles
+                
+                DataLoader -> DataLoader: geometrias[(i,j)] =\n  [coordenadas[i], coordenadas[j]]
+                note right: Línea recta como geometría
+            end
+            
+        else i == j
+            DataLoader -> DataLoader: matriz[i][j] = 0
+            DataLoader -> DataLoader: geometrias[(i,j)] = []
+        end
+        
+    end
+end
+
+DataLoader --> API: (matriz, geometrias)
+deactivate DataLoader
+
+note right of DataLoader
+    **matriz:** ndarray NxN
+    con distancias en metros
+    
+    **geometrias:** dict
+    {(i,j): [(lat,lon), ...]}
+    con puntos de la ruta real
+end note
+
+@enduml

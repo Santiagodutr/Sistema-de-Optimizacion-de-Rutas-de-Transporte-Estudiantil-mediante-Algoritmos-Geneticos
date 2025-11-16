@@ -1,0 +1,196 @@
+@startuml Casos de Uso - Sistema de Optimización de Rutas
+
+left to right direction
+skinparam packageStyle rectangle
+
+' Actores
+actor "Usuario\nAdministrador" as Admin
+actor "Sistema\nFrontend" as Frontend
+actor "OpenStreetMap\nAPI" as OSM
+actor "Geopy\nGeocoder" as Geocoder
+
+' Sistema
+rectangle "Sistema de Optimización de Rutas de Transporte Estudiantil" {
+    
+    ' Casos de Uso - Gestión de Rutas
+    package "Gestión de Rutas" {
+        usecase (Consultar información\nde rutas disponibles) as UC1
+        usecase (Seleccionar rutas\na optimizar) as UC2
+        usecase (Obtener todas\nlas paradas) as UC3
+        usecase (Consultar información\nde ruta específica) as UC4
+    }
+    
+    ' Casos de Uso - Geocodificación
+    package "Geocodificación y Mapeo" {
+        usecase (Geocodificar\ndirecciones) as UC5
+        usecase (Buscar coordenadas\nexactas en BD local) as UC6
+        usecase (Obtener coordenadas\ndesde OpenStreetMap) as UC7
+        usecase (Aplicar coordenadas\nfallback) as UC8
+    }
+    
+    ' Casos de Uso - Cálculo de Distancias
+    package "Cálculo de Distancias" {
+        usecase (Descargar red vial\nde OSM) as UC9
+        usecase (Calcular matriz\nde distancias) as UC10
+        usecase (Calcular geometría\nde rutas por calles) as UC11
+        usecase (Usar caché de\nmatrices) as UC12
+    }
+    
+    ' Casos de Uso - Optimización
+    package "Optimización con Algoritmo Genético" {
+        usecase (Crear población\ninicial) as UC13
+        usecase (Evaluar fitness\nde población) as UC14
+        usecase (Ejecutar selección\npor torneo) as UC15
+        usecase (Aplicar cruce PMX) as UC16
+        usecase (Aplicar mutación\npor intercambio) as UC17
+        usecase (Aplicar elitismo) as UC18
+        usecase (Evolucionar\ngeneraciones) as UC19
+        usecase (Retornar mejor\nruta optimizada) as UC20
+    }
+    
+    ' Casos de Uso - API REST
+    package "Servicios API REST" {
+        usecase (Verificar estado\ndel servidor) as UC21
+        usecase (Obtener información\nbásica de rutas) as UC22
+        usecase (Optimizar todas\nlas rutas) as UC23
+        usecase (Optimizar rutas\nseleccionadas) as UC24
+        usecase (Retornar resultados\ncon geometría) as UC25
+    }
+    
+    ' Casos de Uso - Caché y Rendimiento
+    package "Caché y Optimización" {
+        usecase (Almacenar coordenadas\nen caché) as UC26
+        usecase (Almacenar matrices\nen caché) as UC27
+        usecase (Almacenar geometrías\nen caché) as UC28
+    }
+}
+
+' === RELACIONES PRINCIPALES ===
+
+' Usuario/Admin interactúa con API
+Admin --> UC21
+Admin --> UC22
+Admin --> UC23
+Admin --> UC24
+
+' Frontend consume la API
+Frontend --> UC21
+Frontend --> UC22
+Frontend --> UC23
+Frontend --> UC24
+
+' Flujo de Consulta de Información
+UC1 ..> UC3 : <<include>>
+UC22 ..> UC1 : <<include>>
+UC4 ..> UC3 : <<include>>
+
+' Flujo de Optimización Completa
+UC23 ..> UC2 : <<include>>
+UC24 ..> UC2 : <<include>>
+UC23 ..> UC5 : <<include>>
+UC24 ..> UC5 : <<include>>
+UC23 ..> UC10 : <<include>>
+UC24 ..> UC10 : <<include>>
+UC23 ..> UC19 : <<include>>
+UC24 ..> UC19 : <<include>>
+UC23 ..> UC25 : <<include>>
+UC24 ..> UC25 : <<include>>
+
+' Flujo de Geocodificación
+UC5 ..> UC6 : <<include>>
+UC5 ..> UC7 : <<extend>>
+UC5 ..> UC8 : <<extend>>
+UC7 --> Geocoder : <<use>>
+
+' Flujo de Cálculo de Distancias
+UC10 ..> UC9 : <<include>>
+UC10 ..> UC11 : <<include>>
+UC10 ..> UC12 : <<extend>>
+UC9 --> OSM : <<use>>
+UC11 --> OSM : <<use>>
+
+' Flujo del Algoritmo Genético
+UC19 ..> UC13 : <<include>>
+UC19 ..> UC14 : <<include>>
+UC19 ..> UC15 : <<include>>
+UC19 ..> UC16 : <<include>>
+UC19 ..> UC17 : <<include>>
+UC19 ..> UC18 : <<include>>
+UC19 ..> UC20 : <<include>>
+
+' Flujo de Caché
+UC5 ..> UC26 : <<extend>>
+UC10 ..> UC27 : <<extend>>
+UC11 ..> UC28 : <<extend>>
+
+' === NOTAS EXPLICATIVAS ===
+
+note right of UC23
+    **Parámetros:**
+    GET /api/rutas/optimizar
+    
+    **Proceso:**
+    1. Carga todas las rutas
+    2. Geocodifica paraderos
+    3. Calcula distancias reales
+    4. Optimiza con AG
+    5. Retorna JSON con resultados
+end note
+
+note right of UC24
+    **Parámetros:**
+    GET /api/rutas/optimizar?rutas_ids=1,2,3
+    
+    **Beneficio:**
+    Permite optimizar solo
+    rutas específicas para
+    reducir tiempo de cálculo
+end note
+
+note bottom of UC19
+    **Parámetros del AG:**
+    - Población: 100 individuos
+    - Generaciones: 200
+    - Tasa cruce: 0.8
+    - Tasa mutación: 0.15
+    - Elitismo: 2
+end note
+
+note right of UC10
+    **Resultado:**
+    Matriz NxN con distancias
+    reales en metros usando
+    red vial de OSM
+end note
+
+note left of UC6
+    **Base de datos local:**
+    COORDENADAS_EXACTAS
+    con +150 paraderos
+    predefinidos
+end note
+
+note bottom of UC12
+    **Optimización:**
+    Evita recalcular matrices
+    para las mismas coordenadas
+    (ahorro de ~30-60 seg)
+end note
+
+note right of UC16
+    **Cruce PMX:**
+    Partially Mapped Crossover
+    Mantiene primer y último
+    punto fijos (Universidad)
+end note
+
+note right of UC25
+    **Respuesta incluye:**
+    - Coordenadas optimizadas
+    - Geometría de calles reales
+    - Distancia total (km)
+    - Orden de paradas
+    - Horarios de recogida
+end note
+
+@enduml
