@@ -141,8 +141,7 @@
         "Universidad de los Llanos, Villavicencio, Colombia",
         "Centro Comercial Sinfonía, Villavicencio, Colombia",
         "Biblioteca Cofrem, Villavicencio, Colombia",
-        "Fresilandia, Villavicencio, Colombia",
-        "Colegio Cafam, Villavicencio, Colombia"
+        "Fresilandia, Villavicencio, Colombia"
       ],
       "horarios_recogida": ["5:20 AM", "6:20 AM", "7:20 AM", "8:20 AM"],
       "horarios_regreso": ["11:00 AM", "12:00 PM", "4:00 PM", "5:00 PM", "6:10 PM"],
@@ -175,9 +174,7 @@
         "Tecnicayas Colegio Industrial, Villavicencio, Colombia",
         "Paradero Makro, Villavicencio, Colombia",
         "Alborada Villavicencio, Colombia",
-        "Cooperativa Villavicencio, Colombia",
-        "Bomba Primax, Villavicencio, Colombia",
-        "Barcelona Villavicencio, Colombia"
+        "Cooperativa Villavicencio, Colombia"
       ],
       "horarios_recogida": ["Cada 15-20 minutos desde 5:20 AM hasta 7:10 PM"],
       "horarios_regreso": ["Cada 15-20 minutos"],
