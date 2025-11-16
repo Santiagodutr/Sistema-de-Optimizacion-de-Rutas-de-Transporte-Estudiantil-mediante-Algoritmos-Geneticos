@@ -183,7 +183,9 @@ def optimizar_rutas_reales():
                 "punto_salida": ruta['punto_salida_unillanos'],
                 "orden_original": list(range(len(coords))),  # Para referencia
                 "orden_optimizado": orden_optimizado,  # Orden después de GA
-                "mejora_porcentual": None  # Se calculará si hay datos de comparación
+                "mejora_porcentual": None,  # Se calculará si hay datos de comparación
+                "historial_fitness": resultado_ga.get('historial_fitness', []),  # NUEVO
+                "historial_detallado": resultado_ga.get('historial_detallado', [])  # NUEVO
             }
             
             rutas_optimizadas.append(ruta_optimizada)

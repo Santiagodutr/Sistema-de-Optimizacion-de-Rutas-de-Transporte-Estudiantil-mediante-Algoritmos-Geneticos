@@ -198,6 +198,7 @@ def algoritmo_genetico(
     historial_fitness = []
     mejor_global = None
     mejor_fitness_global = float('inf')
+    historial_detallado = []  # NUEVO: historial con detalles de cada generación
     
     for generacion in range(generaciones):
         # Evaluar fitness
@@ -206,7 +207,22 @@ def algoritmo_genetico(
         # Encontrar el mejor de esta generación
         mejor_idx = np.argmin(fitness_poblacion)
         mejor_fitness = fitness_poblacion[mejor_idx]
+        peor_fitness = np.max(fitness_poblacion)
+        promedio_fitness = np.mean(fitness_poblacion)
+        
         historial_fitness.append(mejor_fitness)
+        
+        # Guardar información detallada de esta generación
+        info_generacion = {
+            'generacion': generacion,
+            'mejor_fitness': float(mejor_fitness),
+            'peor_fitness': float(peor_fitness),
+            'promedio_fitness': float(promedio_fitness),
+            'mejor_ruta': poblacion[mejor_idx].copy(),
+            'ejemplos_torneo': [],
+            'ejemplos_cruce': [],
+            'ejemplos_mutacion': []
+        }
         
         # Actualizar mejor global
         if mejor_fitness < mejor_fitness_global:
@@ -225,24 +241,66 @@ def algoritmo_genetico(
             nueva_poblacion.append(poblacion[idx].copy())
         
         # Generar resto de la población
+        ejemplos_registrados = {'torneo': 0, 'cruce': 0, 'mutacion': 0}
+        
         while len(nueva_poblacion) < tamano_poblacion:
             # Selección
             padre1 = seleccion_torneo(poblacion, fitness_poblacion)
             padre2 = seleccion_torneo(poblacion, fitness_poblacion)
             
+            # Registrar ejemplos de torneo (solo primeros 3)
+            if ejemplos_registrados['torneo'] < 3:
+                info_generacion['ejemplos_torneo'].append({
+                    'padre1': padre1[:min(7, len(padre1))],
+                    'padre2': padre2[:min(7, len(padre2))]
+                })
+                ejemplos_registrados['torneo'] += 1
+            
             # Cruce
             if random.random() < tasa_cruce:
                 hijo1, hijo2 = cruce_pmx(padre1, padre2)
+                
+                # Registrar ejemplos de cruce (solo primeros 3)
+                if ejemplos_registrados['cruce'] < 3:
+                    info_generacion['ejemplos_cruce'].append({
+                        'padre1': padre1[:min(7, len(padre1))],
+                        'padre2': padre2[:min(7, len(padre2))],
+                        'hijo1': hijo1[:min(7, len(hijo1))],
+                        'hijo2': hijo2[:min(7, len(hijo2))]
+                    })
+                    ejemplos_registrados['cruce'] += 1
             else:
                 hijo1, hijo2 = padre1.copy(), padre2.copy()
+            
+            # Guardar estado antes de mutación
+            hijo1_antes = hijo1.copy()
+            hijo2_antes = hijo2.copy()
             
             # Mutación
             hijo1 = mutacion_intercambio(hijo1, tasa_mutacion)
             hijo2 = mutacion_intercambio(hijo2, tasa_mutacion)
             
+            # Registrar ejemplos de mutación (solo si hubo mutación y solo primeros 3)
+            if ejemplos_registrados['mutacion'] < 3:
+                if hijo1 != hijo1_antes:
+                    info_generacion['ejemplos_mutacion'].append({
+                        'antes': hijo1_antes[:min(7, len(hijo1_antes))],
+                        'despues': hijo1[:min(7, len(hijo1))]
+                    })
+                    ejemplos_registrados['mutacion'] += 1
+                elif hijo2 != hijo2_antes and ejemplos_registrados['mutacion'] < 3:
+                    info_generacion['ejemplos_mutacion'].append({
+                        'antes': hijo2_antes[:min(7, len(hijo2_antes))],
+                        'despues': hijo2[:min(7, len(hijo2))]
+                    })
+                    ejemplos_registrados['mutacion'] += 1
+            
             nueva_poblacion.append(hijo1)
             if len(nueva_poblacion) < tamano_poblacion:
                 nueva_poblacion.append(hijo2)
+        
+        poblacion = nueva_poblacion
+        historial_detallado.append(info_generacion)
         
         poblacion = nueva_poblacion
     
@@ -261,5 +319,6 @@ def algoritmo_genetico(
     return {
         'mejor_ruta': mejor_global,
         'mejor_fitness': mejor_fitness_global,
-        'historial_fitness': historial_fitness
+        'historial_fitness': historial_fitness,
+        'historial_detallado': historial_detallado  # NUEVO: información detallada
     }
