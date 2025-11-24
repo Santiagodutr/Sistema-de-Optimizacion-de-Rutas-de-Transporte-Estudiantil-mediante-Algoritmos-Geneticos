@@ -1,0 +1,95 @@
+# 🚀 Instalación
+
+## Requisitos previos
+
+Asegúrate de tener instalados:
+
+- **Python 3.8+** - [Descargar](https://www.python.org/)
+- **Node.js 16+** - [Descargar](https://nodejs.org/)
+- **Git** - [Descargar](https://git-scm.com/)
+
+## Paso 1: Clonar el Repositorio
+
+```bash
+git clone https://github.com/Santiagodutr/Sistema-de-Optimizacion-de-Rutas-de-Transporte-Estudiantil-mediante-Algoritmos-Geneticos.git
+cd Sistema-de-Optimizacion-de-Rutas
+```
+
+## Paso 2: Instalar Backend (Python)
+
+```bash
+cd backend
+pip install -r requirements.txt
+```
+
+### Dependencias instaladas:
+- `flask` - Servidor web
+- `osmnx` - Redes viales de OpenStreetMap
+- `geopy` - Geocodificación
+- `numpy` - Cálculos matriciales
+- `networkx` - Análisis de grafos
+
+## Paso 3: Instalar Frontend (React)
+
+```bash
+cd ../frontend
+npm install
+```
+
+### Dependencias instaladas:
+- `react` - Framework UI
+- `leaflet` - Mapas interactivos
+- `axios` - Cliente HTTP
+- `tailwindcss` - Estilos
+
+## Paso 4: Ejecutar el Sistema
+
+### Terminal 1 - Iniciar Backend
+
+```bash
+cd backend
+python api_rutas_reales.py
+```
+
+✅ El servidor estará disponible en `http://localhost:5000`
+
+Deberías ver:
+```
+ * Running on http://127.0.0.1:5000
+ * Debug mode: on
+ * Restarting with reloader
+```
+
+### Terminal 2 - Iniciar Frontend
+
+```bash
+cd frontend
+npm start
+```
+
+✅ La aplicación se abrirá automáticamente en `http://localhost:3000`
+
+## ✅ Verificar Instalación
+
+Abre tu navegador y accede a:
+- **Frontend**: http://localhost:3000
+- **Backend Health**: http://localhost:5000/api/health
+
+### Respuesta esperada del Backend
+
+```json
+{
+  "status": "healthy",
+  "message": "Backend is running"
+}
+```
+
+Si ves la interfaz en el frontend y el servidor responde correctamente, ¡estás listo para comenzar!
+
+## 🐛 Si algo falla
+
+Consulta la sección de [Troubleshooting](/troubleshooting) para solucionar problemas comunes.
+
+---
+
+**Siguiente paso**: [Guía Rápida](/guia-rapida)

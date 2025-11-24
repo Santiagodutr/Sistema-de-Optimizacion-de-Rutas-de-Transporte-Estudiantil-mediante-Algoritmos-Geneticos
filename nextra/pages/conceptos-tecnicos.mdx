@@ -1,0 +1,130 @@
+# 🔬 Conceptos Técnicos
+
+Comprende cómo funciona el algoritmo por debajo de la interfaz.
+
+## Algoritmo Genético
+
+### Qué es
+
+Un algoritmo de optimización inspirado en la evolución natural de las especies.
+
+### Analogía Biológica
+
+```
+Población de rutas (cromosomas)
+         Flecha baja
+    Evaluación
+  (medir fitness)
+         Flecha baja
+    Selección
+ (los mejores se reproducen)
+         Flecha baja
+    Cruce y Mutación
+  (crear variedad)
+         Flecha baja
+    Nueva Población
+    (siguiente generación)
+```
+
+### Componentes del Sistema
+
+#### Cromosoma (Ruta)
+
+Cada solución es una permutación de paradas:
+
+```
+Cromosoma = [0, 3, 1, 4, 2, 5, 6]
+             ^                 ^
+    Punto de inicio    Punto final
+    (fijo)             (fijo)
+```
+
+#### Población
+
+Conjunto de rutas posibles con 100 individuos.
+
+#### Fitness (Función Objetivo)
+
+Mide qué tan buena es cada ruta:
+
+```
+Menor distancia = MEJOR fitness
+Ejemplo: 11,800m es mejor que 15,200m
+```
+
+---
+
+## Operadores Genéticos
+
+### 1. Selección por Torneo (k=3)
+
+Se eligen 3 rutas aleatorias, se comparan y se selecciona la mejor.
+
+**Ventajas:**
+- Simple y eficiente
+- Equilibrio entre exploración
+- No elimina diversidad
+
+### 2. Cruce PMX (Partially Mapped Crossover)
+
+Intercambia segmento intermedio sin duplicados.
+
+### 3. Mutación por Intercambio
+
+Con probabilidad del 15%, intercambia dos paradas intermedias.
+
+### 4. Elitismo
+
+Los 2 mejores pasan automáticamente a la siguiente generación.
+
+---
+
+## Matriz de Distancias
+
+### Qué es
+
+Tabla NxN donde cada celda contiene la distancia real entre dos puntos.
+
+### Cálculo de Fitness
+
+Para la ruta [0, 3, 1, 4, 2, 5, 6]:
+
+```
+Distancia total = suma de todos los segmentos
+= 800 + 1900 + 1100 + 1300 + 1500 + 800
+= 7,200 metros
+```
+
+---
+
+## Integración con OpenStreetMap
+
+### Por qué OSM
+
+Proporciona distancias reales siguiendo calles, no líneas rectas.
+
+### Proceso de Geocodificación
+
+1. Buscar en base de datos exacta
+2. Si no: Geocodificar con Nominatim
+3. Si falla: Fallback euclidiano multiplicado por 1.3
+
+---
+
+## Parámetros del Algoritmo
+
+### Configuración Actual
+
+- Población: 100 individuos
+- Generaciones: 200 iteraciones
+- Tasa Cruce: 80 por ciento
+- Tasa Mutación: 15 por ciento
+- Elitismo: 2 mejores
+
+### Convergencia
+
+Típicamente converge en generación 50-100 de 200.
+
+---
+
+**Siguiente paso**: [Troubleshooting](/troubleshooting)

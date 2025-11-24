@@ -1,0 +1,129 @@
+# 📖 Uso Detallado
+
+Guía completa de todas las funciones del sistema.
+
+## Panel de Selección de Rutas
+
+### Descripción
+Es la primera sección visible al abrir la aplicación.
+
+### Funciones
+
+#### Dropdown de Rutas
+
+![Selector de Rutas](/images/Seleccion_de_Rutas.png)
+
+
+**Qué ver:**
+- Nombre oficial de la ruta
+- Número de paradas/paraderos
+- Punto de recogida principal
+
+#### Información de la Ruta Seleccionada
+
+Después de seleccionar, verás:
+
+<div style={{ textAlign: 'center', margin: '30px 0' }}>
+  <img 
+    src="/images/Informacionderuta.png" 
+    alt="Información de Rutas"
+    style={{ maxWidth: '500px', width: '100%', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
+  />
+</div>
+
+- Nombre de la ruta
+- Número exacto de paradas
+
+#### Botón Optimizar Ruta
+
+<div style={{ textAlign: 'center', margin: '30px 0' }}>
+  <img 
+    src="/images/OptimizarBotpn.png" 
+    alt="Botón de Optimizar"
+    style={{ maxWidth: '500px', width: '100%', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
+  />
+</div>
+
+**Estados del botón:**
+- Azul normal: Listo para optimizar
+- Amarillo/Spinner: Procesando
+- Verde: Completado
+
+**Tiempo de procesamiento:**
+- Primera vez: 30-60 segundos
+- Siguientes veces: 5-10 segundos
+
+---
+
+## Mapa Interactivo
+
+### Ubicación
+Panel derecho superior (después de optimizar)
+![Mapa](/images/Mapa.png)
+### Funciones Básicas
+
+#### Zoom
+![Zoom](/images/Zoom.png)
+- Botones +/- en esquina superior izquierda
+- Scroll del ratón sobre el mapa
+
+#### Paneo (Movimiento)
+![Desplazamiento](/images/Desplazamiento.png)
+- Arrastra el mapa con el ratón
+- Se auto-centra en la ruta
+
+#### Elementos Visuales
+
+**Polilíneas (Líneas de ruta)**
+- Ruta 1 COVISAN (Azul)
+![COVISAN](/images/COVISAN.png)
+- Ruta 2 MARACOS (Verde)
+![MARACOS](/images/MARACOS.png)
+- Ruta 3 TERMINAL (amarillo)
+![TERMINAL](/images/TERMINAL.png)
+
+
+
+## Panel de Procedimiento Detallado
+
+### Ubicación
+Panel derecho inferior (después de optimizar)
+![Proceso](/images/Proceso.png)
+### Descripción
+Muestra generación por generación cómo evolucionó el algoritmo.
+![Descripcion](/images/Descripcion.png)
+### Secciones
+
+#### Resumen General
+
+![Resumen](/images/Resumen.png)
+
+```
+Resumen de Evolución
+Generaciones: 200
+Mejora: 00,0 %
+Final: 14,71 Km
+```
+
+#### Visualización por Generación
+
+Modo Resumido (por defecto):
+![Resumido](/images/Resumido.png)
+- Gen 0 (inicial)
+- Gen 20, 40, 60, 80...
+- Gen 200 (final)
+
+#### Datos por Generación
+
+![Porgeneracion](/images/Porgeneracion.png)
+
+```
+Gen 0
+Mejor: 14,714 km
+Promedio: 18,211 km
+Peor: 20,62 km
+```
+
+---
+
+**Siguiente paso**: Revisa la sección de [Conceptos Técnicos](/conceptos-tecnicos)

@@ -1,0 +1,170 @@
+# 🔧 Troubleshooting
+
+Soluciones a los problemas más comunes.
+
+## Problemas Comunes
+
+### Error: Backend no está respondiendo
+
+**Síntoma:**
+```
+Error: Cannot GET http://localhost:5000/api/rutas/info
+Network Error
+```
+
+**Causas posibles:**
+- El servidor backend no está corriendo
+- Puerto 5000 ya está ocupado
+- Firewall bloqueando conexión
+
+**Soluciones:**
+
+Verificar que Backend esté corriendo
+
+Terminal:
+```bash
+cd backend
+python api_rutas_reales.py
+```
+
+Deberías ver:
+```
+Running on http://127.0.0.1:5000
+Debug mode: on
+```
+
+#### Si el puerto está ocupado
+
+**Windows:**
+```bash
+netstat -ano | findstr :5000
+taskkill /PID <PID> /F
+```
+
+**Mac/Linux:**
+```bash
+lsof -i :5000
+kill -9 <PID>
+```
+
+---
+
+### Error: Las rutas no cargan
+
+**Síntoma:**
+```
+Seleccionar Ruta (vacío - sin opciones)
+```
+
+**Causas posibles:**
+- rutas_reales.json no existe
+- Archivo JSON mal formateado
+- Backend error de lectura
+
+**Soluciones:**
+
+Verificar archivo JSON
+
+```bash
+cd backend
+ls rutas_reales.json
+python -m json.tool rutas_reales.json
+```
+
+---
+
+### Optimizar toma más de 60 segundos
+
+**Síntoma:**
+```
+Optimizando... (continúa por más de 2 minutos)
+```
+
+**Causas posibles:**
+- Primera ejecución (normal 30-60 seg)
+- Red lenta/sin conexión OSM
+- Demasiadas paradas en la ruta
+
+**Soluciones:**
+
+Primera ejecución es normal:
+- Geocodificación: 5-10 seg
+- Matriz OSM: 20-40 seg
+- Algoritmo GA: 3-5 seg
+- Total: 30-60 seg
+
+---
+
+### Mapa no carga o está gris
+
+**Síntoma:**
+```
+Mapa completamente gris/blanco
+Sin tiles de OpenStreetMap
+```
+
+**Causas:**
+- Sin conexión a internet
+- OpenStreetMap temporalmente caído
+- Bloqueado por firewall
+
+**Soluciones:**
+
+Verificar conexión internet:
+```bash
+ping openstreetmap.org
+```
+
+---
+
+### Frontend no inicia (error npm)
+
+**Síntoma:**
+```
+error: Cannot find module 'react'
+```
+
+**Solución:**
+
+```bash
+cd frontend
+rm -rf node_modules package-lock.json
+npm install
+npm start
+```
+
+---
+
+## Checklist de Diagnóstico
+
+Si hay problemas, seguir este checklist:
+
+```
+☐ Backend ejecutándose
+  Terminal: python api_rutas_reales.py
+
+☐ Frontend ejecutándose
+  Terminal: npm start
+
+☐ Puerto 5000 disponible
+  netstat -ano | findstr :5000
+
+☐ rutas_reales.json existe
+  cd backend && ls rutas_reales.json
+
+☐ Conexión a internet
+  ping google.com
+
+☐ Navegador actualizado
+  Chrome, Firefox, Safari, Edge
+
+☐ Caché limpio
+  F12 - Aplicación - Borrar caché local
+
+☐ Puertos no bloqueados
+  Desabilitar firewall si es necesario
+```
+
+---
+
+**Siguiente paso**: [FAQ](/faq)
