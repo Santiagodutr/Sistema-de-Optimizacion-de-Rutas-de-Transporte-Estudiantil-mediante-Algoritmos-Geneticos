@@ -29,7 +29,7 @@ function App() {
     }
   };
 
-  const optimizarRuta = async (rutaId) => {
+  const optimizarRuta = async (rutaId, parametros = {}) => {
     if (!rutaId) {
       toast.warning('Por favor selecciona una ruta');
       return;
@@ -42,7 +42,34 @@ function App() {
     toast.loading('Optimizando ruta...', { id: 'optimizando' });
 
     try {
-      const response = await axios.get(`/api/rutas/optimizar?rutas_ids=${rutaId}`);
+      // Construir URL con parámetros
+      const params = new URLSearchParams();
+      params.append('rutas_ids', rutaId);
+      
+      // Agregar parámetros del algoritmo genético si se proporcionan
+      if (parametros.paradaInicial !== undefined) {
+        params.append('punto_inicio_idx', parametros.paradaInicial);
+      }
+      if (parametros.paradaFinal !== undefined) {
+        params.append('punto_fin_idx', parametros.paradaFinal);
+      }
+      if (parametros.tamano_poblacion) {
+        params.append('tamano_poblacion', parametros.tamano_poblacion);
+      }
+      if (parametros.generaciones) {
+        params.append('generaciones', parametros.generaciones);
+      }
+      if (parametros.tasa_cruce) {
+        params.append('tasa_cruce', parametros.tasa_cruce);
+      }
+      if (parametros.tasa_mutacion) {
+        params.append('tasa_mutacion', parametros.tasa_mutacion);
+      }
+      if (parametros.elitismo) {
+        params.append('elitismo', parametros.elitismo);
+      }
+
+      const response = await axios.get(`/api/rutas/optimizar?${params.toString()}`);
       setRutasOptimizadas(response.data.rutas);
       setEstadisticas(response.data.estadisticas);
       toast.success('Ruta optimizada', { id: 'optimizando' });
@@ -93,8 +120,8 @@ function App() {
         <main className="max-w-[1600px] mx-auto px-6 py-6">
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
             
-            {/* Columna Izquierda: Selector y Panel GA */}
-            <div className="xl:col-span-4 space-y-6">
+            {/* Columna Izquierda: Selector */}
+            <div className="xl:col-span-4">
               <RouteSelector
                 rutasDisponibles={rutasDisponibles}
                 rutaSeleccionada={rutaSeleccionada}
@@ -102,13 +129,6 @@ function App() {
                 optimizarRuta={optimizarRuta}
                 cargando={cargando}
               />
-              
-              {rutasOptimizadas.length > 0 && (
-                <GeneticAlgorithmPanel
-                  rutasOptimizadas={rutasOptimizadas}
-                  estadisticas={estadisticas}
-                />
-              )}
             </div>
 
             {/* Columna Derecha: Mapa y Procedimiento */}
@@ -125,6 +145,16 @@ function App() {
               )}
             </div>
           </div>
+
+          {/* Panel de Algoritmo Genético - Ancho completo debajo */}
+          {rutasOptimizadas.length > 0 && (
+            <div className="mt-6">
+              <GeneticAlgorithmPanel
+                rutasOptimizadas={rutasOptimizadas}
+                estadisticas={estadisticas}
+              />
+            </div>
+          )}
         </main>
 
         <footer className="mt-12 border-t border-slate-200 bg-white">

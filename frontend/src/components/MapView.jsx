@@ -12,6 +12,53 @@ L.Icon.Default.mergeOptions({
   shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
 });
 
+// Iconos personalizados para inicio y fin
+const createCustomIcon = (color, label) => {
+  return L.divIcon({
+    className: 'custom-marker',
+    html: `<div style="
+      background-color: ${color};
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 3px solid white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 12px;
+    ">${label}</div>`,
+    iconSize: [28, 28],
+    iconAnchor: [14, 14],
+    popupAnchor: [0, -14]
+  });
+};
+
+const createNumberIcon = (number, color) => {
+  return L.divIcon({
+    className: 'custom-marker',
+    html: `<div style="
+      background-color: ${color};
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 11px;
+    ">${number}</div>`,
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
+    popupAnchor: [0, -12]
+  });
+};
+
 const MapView = ({ rutasOptimizadas, cargando }) => {
   const centro = [4.142, -73.626]; // Villavicencio
   
@@ -89,33 +136,49 @@ const MapView = ({ rutasOptimizadas, cargando }) => {
                   />
                   
                   {/* Marcadores en las paradas */}
-                  {ruta.coordenadas.map((coord, paradaIdx) => (
-                    <Marker key={`${idx}-${paradaIdx}`} position={coord}>
-                      <Popup className="custom-popup">
-                        <div className="p-2 min-w-[200px]">
-                          <h4 className="font-bold text-slate-900 mb-1 flex items-center gap-2">
-                            <div 
-                              className="w-3 h-3 rounded-full" 
-                              style={{ backgroundColor: color }}
-                            />
-                            {ruta.nombre}
-                          </h4>
-                          <div className="text-xs space-y-1 text-slate-600">
-                            <p>
-                              <span className="font-semibold">Parada:</span> {paradaIdx + 1} / {ruta.numero_paradas}
-                            </p>
-                            <p className="truncate">
-                              <span className="font-semibold">Dirección:</span><br/>
-                              {ruta.paraderos?.[paradaIdx]}
-                            </p>
-                            <p>
-                              <span className="font-semibold">Distancia total:</span> {ruta.distancia_total_km} km
-                            </p>
+                  {ruta.coordenadas.map((coord, paradaIdx) => {
+                    const isInicio = paradaIdx === 0;
+                    const isFin = paradaIdx === ruta.coordenadas.length - 1;
+                    
+                    let icon;
+                    if (isInicio) {
+                      icon = createCustomIcon('#10B981', 'I'); // Verde para inicio
+                    } else if (isFin) {
+                      icon = createCustomIcon('#EF4444', 'F'); // Rojo para fin
+                    } else {
+                      icon = createNumberIcon(paradaIdx + 1, color);
+                    }
+                    
+                    return (
+                      <Marker key={`${idx}-${paradaIdx}`} position={coord} icon={icon}>
+                        <Popup className="custom-popup">
+                          <div className="p-2 min-w-[200px]">
+                            <h4 className="font-bold text-slate-900 mb-1 flex items-center gap-2">
+                              <div 
+                                className="w-3 h-3 rounded-full" 
+                                style={{ backgroundColor: isInicio ? '#10B981' : isFin ? '#EF4444' : color }}
+                              />
+                              {ruta.nombre}
+                              {isInicio && <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">INICIO</span>}
+                              {isFin && <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full">FIN</span>}
+                            </h4>
+                            <div className="text-xs space-y-1 text-slate-600">
+                              <p>
+                                <span className="font-semibold">Parada:</span> {paradaIdx + 1} / {ruta.numero_paradas}
+                              </p>
+                              <p className="truncate">
+                                <span className="font-semibold">Dirección:</span><br/>
+                                {ruta.paraderos?.[paradaIdx]}
+                              </p>
+                              <p>
+                                <span className="font-semibold">Distancia total:</span> {ruta.distancia_total_km} km
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                      </Popup>
-                    </Marker>
-                  ))}
+                        </Popup>
+                      </Marker>
+                    );
+                  })}
                 </React.Fragment>
               );
             })}

@@ -33,6 +33,7 @@ def obtener_info_rutas():
                 "nombre": ruta['nombre'],
                 "punto_principal": ruta['punto_recogida_principal'],
                 "numero_paraderos": len(ruta['paraderos']),
+                "paraderos": ruta['paraderos'],  # Incluir lista de paraderos
                 "horarios_recogida": ruta['horarios_recogida']
             })
         
@@ -54,11 +55,33 @@ def optimizar_rutas_reales():
     Parámetros GET:
         - rutas_ids: IDs de rutas a optimizar separados por coma (ej: "1,3,5")
                     Si no se especifica, optimiza TODAS
+        - punto_inicio_idx: Índice de la parada inicial (default: 0)
+        - punto_fin_idx: Índice de la parada final (default: última parada)
+        - tamano_poblacion: Tamaño de la población del AG (default: 100)
+        - generaciones: Número de generaciones (default: 200)
+        - tasa_cruce: Tasa de cruce (default: 0.8)
+        - tasa_mutacion: Tasa de mutación (default: 0.15)
+        - elitismo: Número de élites (default: 2)
     Ejemplo: /api/rutas/optimizar?rutas_ids=1,2,3
     """
     try:
         # Obtener parámetro de rutas a optimizar
         rutas_ids_param = request.args.get('rutas_ids', None)
+        
+        # Obtener parámetros del algoritmo genético
+        punto_inicio_idx = request.args.get('punto_inicio_idx', None)
+        punto_fin_idx = request.args.get('punto_fin_idx', None)
+        tamano_poblacion = int(request.args.get('tamano_poblacion', 100))
+        generaciones = int(request.args.get('generaciones', 200))
+        tasa_cruce = float(request.args.get('tasa_cruce', 0.8))
+        tasa_mutacion = float(request.args.get('tasa_mutacion', 0.15))
+        elitismo = int(request.args.get('elitismo', 2))
+        
+        # Convertir índices si se proporcionan
+        if punto_inicio_idx is not None:
+            punto_inicio_idx = int(punto_inicio_idx)
+        if punto_fin_idx is not None:
+            punto_fin_idx = int(punto_fin_idx)
         
         if rutas_ids_param:
             rutas_ids = [int(id.strip()) for id in rutas_ids_param.split(',')]
@@ -66,6 +89,11 @@ def optimizar_rutas_reales():
         else:
             rutas_ids = None
             print(f"\n🎯 Optimizando TODAS las rutas")
+        
+        print(f"📊 Parámetros del AG: población={tamano_poblacion}, generaciones={generaciones}, ")
+        print(f"   cruce={tasa_cruce}, mutación={tasa_mutacion}, elitismo={elitismo}")
+        if punto_inicio_idx is not None:
+            print(f"   Parada inicial: {punto_inicio_idx}, Parada final: {punto_fin_idx}")
         
         print("\n" + "="*80)
         print("🚀 OPTIMIZANDO RUTAS REALES - UNIVERSIDAD DE LOS LLANOS")
@@ -128,17 +156,25 @@ def optimizar_rutas_reales():
                 cache_geometrias[matriz_key] = geometrias
                 print(f"   ✅ Matriz y geometrías calculadas (rutas siguen calles reales)")
             
+            # Determinar puntos de inicio y fin para el algoritmo genético
+            inicio_idx = punto_inicio_idx if punto_inicio_idx is not None else 0
+            fin_idx = punto_fin_idx if punto_fin_idx is not None else len(coords) - 1
+            
+            print(f"   📍 Punto inicio: {inicio_idx + 1}, Punto fin: {fin_idx + 1}")
+            
             # 🧬 OPTIMIZAR RUTA CON ALGORITMO GENÉTICO
             print(f"   🧬 Optimizando orden de paradas con Algoritmo Genético...")
+            
+            # El algoritmo genético optimiza todas las paradas, con inicio y fin fijos
             resultado_ga = algoritmo_genetico(
                 matriz_distancias=matriz,
-                punto_inicio_idx=0,  # Primer paradero
-                punto_fin_idx=len(coords) - 1,  # Último paradero (Universidad)
-                tamano_poblacion=100,
-                generaciones=200,
-                tasa_cruce=0.8,
-                tasa_mutacion=0.15,
-                elitismo=2,
+                punto_inicio_idx=inicio_idx,
+                punto_fin_idx=fin_idx,
+                tamano_poblacion=tamano_poblacion,
+                generaciones=generaciones,
+                tasa_cruce=tasa_cruce,
+                tasa_mutacion=tasa_mutacion,
+                elitismo=elitismo,
                 verbose=True
             )
             
@@ -181,11 +217,21 @@ def optimizar_rutas_reales():
                 "numero_paradas": len(coords_optimizadas),
                 "horarios_recogida": ruta['horarios_recogida'],
                 "punto_salida": ruta['punto_salida_unillanos'],
-                "orden_original": list(range(len(coords))),  # Para referencia
+                "orden_original": list(range(len(coords))),  # Índices originales
                 "orden_optimizado": orden_optimizado,  # Orden después de GA
                 "mejora_porcentual": None,  # Se calculará si hay datos de comparación
-                "historial_fitness": resultado_ga.get('historial_fitness', []),  # NUEVO
-                "historial_detallado": resultado_ga.get('historial_detallado', [])  # NUEVO
+                "historial_fitness": resultado_ga.get('historial_fitness', []),
+                "historial_detallado": resultado_ga.get('historial_detallado', []),
+                # Parámetros del algoritmo genético utilizados
+                "parametros_ga": {
+                    "punto_inicio_idx": inicio_idx,
+                    "punto_fin_idx": fin_idx,
+                    "tamano_poblacion": tamano_poblacion,
+                    "generaciones": generaciones,
+                    "tasa_cruce": tasa_cruce,
+                    "tasa_mutacion": tasa_mutacion,
+                    "elitismo": elitismo
+                }
             }
             
             rutas_optimizadas.append(ruta_optimizada)
