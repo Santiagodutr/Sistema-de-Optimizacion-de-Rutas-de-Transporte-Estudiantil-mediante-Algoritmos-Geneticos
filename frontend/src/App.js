@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { Toaster, toast } from 'sonner';
-import { Bus, Map, Activity, Sparkles, Github } from 'lucide-react';
+import { Bus, Map, Activity, Sparkles, Github, Brain } from 'lucide-react';
 import RouteSelector from './components/RouteSelector';
 import GeneticAlgorithmPanel from './components/GeneticAlgorithmPanel';
 import AlgorithmProcedurePanel from './components/AlgorithmProcedurePanel';
 import MapView from './components/MapView';
+import AIAnalysisModal from './components/AIAnalysisModal';
 import axios from 'axios';
 
 function App() {
@@ -14,6 +15,11 @@ function App() {
   const [rutasOptimizadas, setRutasOptimizadas] = useState([]);
   const [estadisticas, setEstadisticas] = useState(null);
   const [cargando, setCargando] = useState(false);
+  
+  // Estados para el análisis con IA
+  const [modalIAOpen, setModalIAOpen] = useState(false);
+  const [analisisIA, setAnalisisIA] = useState(null);
+  const [cargandoIA, setCargandoIA] = useState(false);
 
   useEffect(() => {
     cargarRutasDisponibles();
@@ -81,10 +87,50 @@ function App() {
     }
   };
 
+  // Función para generar análisis con IA
+  const generarAnalisisIA = async () => {
+    if (rutasOptimizadas.length === 0) {
+      toast.warning('Primero debes optimizar una ruta');
+      return;
+    }
+
+    setCargandoIA(true);
+    setModalIAOpen(true);
+    setAnalisisIA(null);
+
+    try {
+      const response = await axios.post('/api/analisis-ia', {
+        ruta: rutasOptimizadas[0],
+        estadisticas: estadisticas
+      });
+
+      if (response.data.success) {
+        setAnalisisIA(response.data.analisis);
+        toast.success('Análisis generado correctamente');
+      } else {
+        toast.error('Error al generar el análisis');
+      }
+    } catch (error) {
+      console.error('Error generando análisis IA:', error);
+      toast.error('Error al conectar con el servicio de IA');
+      setAnalisisIA('Error al generar el análisis. Por favor, intenta de nuevo.');
+    } finally {
+      setCargandoIA(false);
+    }
+  };
+
   return (
     <Router>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
         <Toaster position="top-right" richColors />
+        
+        {/* Modal de Análisis IA */}
+        <AIAnalysisModal
+          isOpen={modalIAOpen}
+          onClose={() => setModalIAOpen(false)}
+          analisis={analisisIA}
+          cargando={cargandoIA}
+        />
         
         <header className="bg-white border-b border-slate-200 shadow-sm">
           <div className="max-w-[1600px] mx-auto px-6 py-4">
@@ -104,15 +150,19 @@ function App() {
                 </div>
               </div>
               
-              <a 
-                href="https://github.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-4 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all"
-              >
-                <Github className="w-4 h-4" />
-                <span className="hidden sm:inline">GitHub</span>
-              </a>
+              <div className="flex items-center gap-3">
+                
+                
+                <a 
+                  href="https://github.com" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all"
+                >
+                  <Github className="w-4 h-4" />
+                  <span className="hidden sm:inline">GitHub</span>
+                </a>
+              </div>
             </div>
           </div>
         </header>
@@ -152,6 +202,7 @@ function App() {
               <GeneticAlgorithmPanel
                 rutasOptimizadas={rutasOptimizadas}
                 estadisticas={estadisticas}
+                onAnalisisIA={generarAnalisisIA}
               />
             </div>
           )}

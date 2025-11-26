@@ -1,9 +1,9 @@
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
-import { Dna, TrendingDown, Route, MapPin, Activity, Target, Flag, Navigation } from 'lucide-react';
+import { Dna, TrendingDown, Route, MapPin, Activity, Target, Flag, Navigation, Brain, Sparkles } from 'lucide-react';
 
-const GeneticAlgorithmPanel = ({ rutasOptimizadas, estadisticas }) => {
+const GeneticAlgorithmPanel = ({ rutasOptimizadas, estadisticas, onAnalisisIA }) => {
   const ruta = rutasOptimizadas[0];
 
   return (
@@ -20,6 +20,17 @@ const GeneticAlgorithmPanel = ({ rutasOptimizadas, estadisticas }) => {
             </div>
           </div>
           <div className="flex items-center gap-3">
+            {/* Botón de Análisis con IA */}
+            {onAnalisisIA && (
+              <button
+                onClick={onAnalisisIA}
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-lg font-medium shadow-lg shadow-purple-500/25 transition-all text-sm"
+              >
+                <Brain className="w-4 h-4" />
+                <span>Análisis con IA</span>
+                <Sparkles className="w-3.5 h-3.5" />
+              </button>
+            )}
             <div className="text-right">
               <h3 className="font-semibold text-slate-900 flex items-center gap-2">
                 <Route className="w-4 h-4 text-purple-500" />

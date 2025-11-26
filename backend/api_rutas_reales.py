@@ -6,6 +6,18 @@ from genetic_algorithm import algoritmo_genetico
 import numpy as np
 import traceback
 import json
+import os
+from dotenv import load_dotenv
+from google import genai
+
+# Cargar variables de entorno
+load_dotenv()
+
+# Configurar API de Gemini
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+gemini_client = None
+if GEMINI_API_KEY:
+    gemini_client = genai.Client(api_key=GEMINI_API_KEY)
 
 app = Flask(__name__)
 CORS(app)
@@ -274,16 +286,151 @@ def optimizar_rutas_reales():
             "traceback": traceback.format_exc()
         }), 500
 
+
+@app.route("/api/analisis-ia", methods=["POST"])
+def analisis_ia():
+    """
+    Genera un análisis completo de la optimización usando Gemini AI.
+    Recibe los datos de la optimización y genera un análisis detallado.
+    """
+    try:
+        if not GEMINI_API_KEY:
+            return jsonify({
+                "error": "API Key de Gemini no configurada",
+                "message": "Configura GEMINI_API_KEY en el archivo .env"
+            }), 500
+        
+        if not gemini_client:
+            return jsonify({
+                "error": "Cliente de Gemini no inicializado",
+                "message": "Verifica la API Key en el archivo .env"
+            }), 500
+        
+        datos = request.get_json()
+        
+        if not datos:
+            return jsonify({
+                "error": "No se recibieron datos para analizar"
+            }), 400
+        
+        # Extraer información de la optimización
+        ruta = datos.get('ruta', {})
+        estadisticas = datos.get('estadisticas', {})
+        
+        # Construir el prompt para Gemini
+        prompt = f"""Responde ÚNICAMENTE con el análisis en formato Markdown. NO incluyas frases introductorias como "Aquí tienes", "Entendido", "Claro", etc. Comienza directamente con el título del análisis.
+Eres un experto en algoritmos genéticos y optimización de rutas de transporte. Analiza los siguientes resultados de una optimización de rutas de transporte estudiantil de la Universidad de los Llanos (Colombia).
+
+## DATOS DE LA OPTIMIZACIÓN
+
+### Información de la Ruta
+- **Nombre de la Ruta:** {ruta.get('nombre', 'No especificado')}
+- **ID de la Ruta:** {ruta.get('ruta_id', 'No especificado')}
+- **Número de Paradas:** {ruta.get('numero_paradas', 0)}
+- **Distancia Total Optimizada:** {ruta.get('distancia_total_km', 0)} km ({ruta.get('distancia_total_metros', 0)} metros)
+- **Punto de Salida:** {ruta.get('punto_salida', 'No especificado')}
+- **Horarios de Recogida:** {ruta.get('horarios_recogida', [])}
+
+### Paraderos (en orden optimizado)
+{chr(10).join([f"  {i+1}. {p}" for i, p in enumerate(ruta.get('paraderos', [])[:15])])}
+{"... y más paradas" if len(ruta.get('paraderos', [])) > 15 else ""}
+
+### Parámetros del Algoritmo Genético Utilizados
+- **Tamaño de Población:** {ruta.get('parametros_ga', {}).get('tamano_poblacion', 100)} individuos
+- **Número de Generaciones:** {ruta.get('parametros_ga', {}).get('generaciones', 200)}
+- **Tasa de Cruce (PMX):** {ruta.get('parametros_ga', {}).get('tasa_cruce', 0.8) * 100}%
+- **Tasa de Mutación:** {ruta.get('parametros_ga', {}).get('tasa_mutacion', 0.15) * 100}%
+- **Elitismo:** {ruta.get('parametros_ga', {}).get('elitismo', 2)} mejores individuos preservados
+- **Parada Inicial (fija):** Índice {ruta.get('parametros_ga', {}).get('punto_inicio_idx', 0)}
+- **Parada Final (fija):** Índice {ruta.get('parametros_ga', {}).get('punto_fin_idx', 'último')}
+
+### Historial de Evolución
+- **Fitness Inicial:** {ruta.get('historial_fitness', [0])[0] / 1000:.3f} km
+- **Fitness Final:** {ruta.get('historial_fitness', [0])[-1] / 1000:.3f} km
+- **Mejora Obtenida:** {((ruta.get('historial_fitness', [0])[0] - ruta.get('historial_fitness', [0])[-1]) / ruta.get('historial_fitness', [1])[0] * 100) if ruta.get('historial_fitness', []) and ruta.get('historial_fitness', [0])[0] > 0 else 0:.2f}%
+
+### Orden de Paradas
+- **Orden Original:** {ruta.get('orden_original', [])}
+- **Orden Optimizado:** {ruta.get('orden_optimizado', [])}
+
+### Estadísticas Generales
+- **Total de Rutas Procesadas:** {estadisticas.get('total_rutas', 1)}
+- **Distancia Total del Sistema:** {estadisticas.get('distancia_total_km', 0)} km
+- **Promedio por Ruta:** {estadisticas.get('promedio_distancia_km', 0)} km
+- **Total de Paraderos:** {estadisticas.get('total_paraderos', 0)}
+
+---
+
+## INSTRUCCIONES PARA EL ANÁLISIS
+
+Genera un análisis completo y educativo que incluya:
+
+1. **📊 Resumen Ejecutivo**: Síntesis de los resultados obtenidos y su significado.
+
+2. **🧬 Explicación del Algoritmo Genético**:
+   - Describe cómo funciona el algoritmo genético aplicado a este problema.
+   - Explica los operadores utilizados: Selección por Torneo, Cruce PMX (Partially Mapped Crossover) y Mutación por Intercambio.
+   - Justifica el uso del elitismo.
+
+3. **📈 Análisis de los Parámetros**:
+   - Evalúa si los parámetros utilizados son adecuados.
+   - Sugiere posibles mejoras o ajustes.
+
+4. **🎯 Interpretación de Resultados**:
+   - Analiza la distancia obtenida y si es una buena solución.
+   - Comenta sobre la convergencia del algoritmo.
+
+5. **💡 Recomendaciones**:
+   - Proporciona sugerencias para mejorar futuras optimizaciones.
+   - Considera aspectos prácticos del transporte estudiantil.
+
+6. **🔍 Conclusiones Técnicas**:
+   - Resume los aspectos más importantes del análisis.
+
+Usa formato Markdown para estructurar la respuesta. Sé claro, educativo y detallado.
+IMPORTANTE: Comienza tu respuesta directamente con "## 📋 Resumen Ejecutivo" sin ningún texto previo.
+"""
+        
+        print(f"🤖 Generando análisis con IA...")
+        
+        # Llamar a Gemini con la nueva API
+        respuesta = gemini_client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=prompt
+        )
+        
+        analisis_texto = respuesta.text
+        
+        print(f"✅ Análisis generado exitosamente")
+        
+        return jsonify({
+            "success": True,
+            "analisis": analisis_texto,
+            "mensaje": "Análisis generado correctamente con Gemini AI"
+        })
+    
+    except Exception as e:
+        print(f"❌ Error generando análisis IA: {str(e)}")
+        print(traceback.format_exc())
+        
+        return jsonify({
+            "error": str(e),
+            "message": "Error al generar el análisis con IA",
+            "traceback": traceback.format_exc()
+        }), 500
+
+
 if __name__ == "__main__":
     print("\n" + "="*80)
     print("🚌 SISTEMA DE RUTAS - UNIVERSIDAD DE LOS LLANOS")
     print("="*80)
     print("\nEndpoints disponibles:")
-    print("  GET /api/health                      - Verificar estado del servidor")
-    print("  GET /api/rutas/info                  - Información básica de rutas")
-    print("  GET /api/rutas/optimizar             - Optimizar TODAS las rutas")
-    print("  GET /api/rutas/optimizar?rutas_ids=1 - Optimizar solo ruta 1")
-    print("  GET /api/rutas/optimizar?rutas_ids=1,2,3 - Optimizar rutas 1, 2 y 3")
+    print("  GET  /api/health                      - Verificar estado del servidor")
+    print("  GET  /api/rutas/info                  - Información básica de rutas")
+    print("  GET  /api/rutas/optimizar             - Optimizar TODAS las rutas")
+    print("  GET  /api/rutas/optimizar?rutas_ids=1 - Optimizar solo ruta 1")
+    print("  GET  /api/rutas/optimizar?rutas_ids=1,2,3 - Optimizar rutas 1, 2 y 3")
+    print("  POST /api/analisis-ia                 - Generar análisis con Gemini AI")
     print("\n" + "="*80 + "\n")
     
     app.run(debug=True, port=5000)
