@@ -87,6 +87,22 @@ if (¿Selecciona una ruta?) then (Sí)
     Número de paradas,
     Orden optimizado;
     
+    :Usuario puede hacer clic en "Animar Recorrido";
+    if (¿Animar Recorrido?) then (Sí)
+      :MapView inicia animación de ruta;
+      note right
+        La animación dibuja un Polyline destacado
+        que avanza a lo largo de la geometría (sin
+        necesidad de un ícono de bus); la duración
+        por defecto es ~15s (escalable por velocidad).
+      end note
+
+      :Usuario puede controlar (Play/Pause/Stop/Speed)
+      desde el panel de animación;
+    else (No)
+      :Usuario no reproduce animación;
+    endif
+
     :Usuario puede hacer clic en "Analizar con IA";
     if (¿Analizar con IA?) then (Sí)
       :Sistema empaqueta resultados + parámetros y

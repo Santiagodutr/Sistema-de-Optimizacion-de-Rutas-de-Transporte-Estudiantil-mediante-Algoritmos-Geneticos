@@ -227,11 +227,4 @@ A PARTIR DE LAS 5:20 AM, DURANTE TODO EL DIA CADA 15/20 MINUTOS HASTA LAS 7:10 P
 SALIENDO DESDE LA UNIVERSIDAD
 Paradero: unicentro paradero buses publicos
 
-===============================================
-NOTAS IMPORTANTES:
-- Hay 11 rutas en total
-- Cada ruta tiene horarios específicos de recogida en la mañana
-- Todas las rutas pasan por la Universidad de los Llanos
-- Los paraderos están en diferentes barrios/sectores de Villavicencio
-- Algunas rutas tienen horarios especiales (Ruta 11 cada 15-20 min todo el día)
-===============================================
+
