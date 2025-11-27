@@ -5,8 +5,7 @@ title Diagrama de Flujo - Frontend del Sistema de Optimización de Rutas
 start
 :Usuario abre la aplicación;
 
-:Sistema carga rutas disponibles
-GET /api/rutas/info;
+:Sistema carga rutas disponibles;
 
 :Usuario ve lista de rutas;
 
@@ -17,7 +16,24 @@ if (¿Selecciona una ruta?) then (Sí)
   
   :Sistema muestra información
   de la ruta (nombre, paradas);
-  
+
+  :Usuario selecciona Parada Inicial y Parada Final;
+  note right
+    Opcional: el usuario puede escoger
+    manualmente la parada de inicio y
+    la parada final para el recorrido.
+  end note
+
+  :Usuario ajusta parámetros del
+  Algoritmo Genético (GA):
+  • Tamaño población
+  • Número de generaciones
+  • Tasa de mutación;
+  note right
+    El panel de parámetros permite afinar
+    la búsqueda antes de ejecutar la optimización.
+  end note
+
   :Usuario hace clic en
   "Optimizar Ruta";
   
@@ -25,7 +41,7 @@ if (¿Selecciona una ruta?) then (Sí)
   "Cargando...";
   
   :Sistema envía petición
-  GET /api/rutas/optimizar?rutas_ids=X;
+  al backend con ID de ruta;
   
   :Sistema muestra animación
   de carga en mapa;
@@ -71,6 +87,28 @@ if (¿Selecciona una ruta?) then (Sí)
     Número de paradas,
     Orden optimizado;
     
+    :Usuario puede hacer clic en "Analizar con IA";
+    if (¿Analizar con IA?) then (Sí)
+      :Sistema empaqueta resultados + parámetros y
+      envía petición al servicio AI (Gemini);
+      note right
+        Prompt incluye: resultados de optimización,
+        parámetros GA usados, métricas y restricciones.
+      end note
+
+      :Sistema muestra modal con análisis
+      generado por la IA (explicación, recomendaciones,
+      sugerencias de parámetros);
+      note right
+        El modal contiene: resumen, listado de mejoras,
+        y acciones sugeridas (ajustar parámetros, re-ejecutar).
+      end note
+
+      :Usuario lee el análisis y cierra el modal;
+    else (No)
+      :Usuario omite el análisis con IA;
+    endif
+
     :Usuario revisa panel
     de procedimiento;
     
@@ -83,7 +121,7 @@ if (¿Selecciona una ruta?) then (Sí)
     endif
     
   else (Error)
-    :Sistema muestra toast de error;
+    :Sistema muestra notificación de error;
     
     :Sistema mantiene última vista válida;
     
