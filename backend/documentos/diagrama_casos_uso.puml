@@ -1,16 +1,22 @@
-@startuml Casos de Uso - Sistema de Optimización de Rutas
+@startuml Casos de Uso - Sistema de Optimización de Rutas con IA
 
 left to right direction
 skinparam packageStyle rectangle
+skinparam usecase {
+    BackgroundColor #F8F8F8
+    BorderColor #666
+    FontStyle bold
+}
 
 ' Actores
 actor "Usuario\nAdministrador" as Admin
 actor "Sistema\nFrontend" as Frontend
 actor "OpenStreetMap\nAPI" as OSM
 actor "Geopy\nGeocoder" as Geocoder
+actor "Google Gemini\nAI" as Gemini
 
 ' Sistema
-rectangle "Sistema de Optimización de Rutas de Transporte Estudiantil" {
+rectangle "Sistema de Optimización de Rutas de Transporte Estudiantil v2.0" {
     
     ' Casos de Uso - Gestión de Rutas
     package "Gestión de Rutas" {
@@ -57,11 +63,21 @@ rectangle "Sistema de Optimización de Rutas de Transporte Estudiantil" {
         usecase (Retornar resultados\ncon geometría) as UC25
     }
     
+    ' Casos de Uso - Análisis con IA (NUEVO)
+    package "Análisis Inteligente con IA" {
+        usecase (Generar análisis\ncon Google Gemini) as UC26
+        usecase (Construir prompt\ndetallado) as UC27
+        usecase (Interpretar resultados\ndel GA) as UC28
+        usecase (Generar recomendaciones) as UC29
+        usecase (Renderizar análisis\nen Markdown) as UC30
+        usecase (Exportar análisis\n(copiar/descargar)) as UC31
+    }
+    
     ' Casos de Uso - Caché y Rendimiento
     package "Caché y Optimización" {
-        usecase (Almacenar coordenadas\nen caché) as UC26
-        usecase (Almacenar matrices\nen caché) as UC27
-        usecase (Almacenar geometrías\nen caché) as UC28
+        usecase (Almacenar coordenadas\nen caché) as UC32
+        usecase (Almacenar matrices\nen caché) as UC33
+        usecase (Almacenar geometrías\nen caché) as UC34
     }
 }
 
@@ -72,12 +88,14 @@ Admin --> UC21
 Admin --> UC22
 Admin --> UC23
 Admin --> UC24
+Admin --> UC26
 
 ' Frontend consume la API
 Frontend --> UC21
 Frontend --> UC22
 Frontend --> UC23
 Frontend --> UC24
+Frontend --> UC26
 
 ' Flujo de Consulta de Información
 UC1 ..> UC3 : <<include>>
@@ -95,6 +113,14 @@ UC23 ..> UC19 : <<include>>
 UC24 ..> UC19 : <<include>>
 UC23 ..> UC25 : <<include>>
 UC24 ..> UC25 : <<include>>
+
+' Flujo de Análisis IA (NUEVO)
+UC26 ..> UC27 : <<include>>
+UC27 ..> UC28 : <<include>>
+UC28 ..> UC29 : <<include>>
+UC29 ..> UC30 : <<include>>
+UC30 ..> UC31 : <<include>>
+UC26 --> Gemini : <<use>>
 
 ' Flujo de Geocodificación
 UC5 ..> UC6 : <<include>>
@@ -119,9 +145,12 @@ UC19 ..> UC18 : <<include>>
 UC19 ..> UC20 : <<include>>
 
 ' Flujo de Caché
-UC5 ..> UC26 : <<extend>>
-UC10 ..> UC27 : <<extend>>
-UC11 ..> UC28 : <<extend>>
+UC5 ..> UC32 : <<extend>>
+UC10 ..> UC33 : <<extend>>
+UC11 ..> UC34 : <<extend>>
+
+' Relación AG con Análisis IA
+UC20 ..> UC26 : <<extend>>
 
 ' === NOTAS EXPLICATIVAS ===
 
@@ -154,6 +183,31 @@ note bottom of UC19
     - Tasa cruce: 0.8
     - Tasa mutación: 0.15
     - Elitismo: 2
+end note
+
+note right of UC26 #FF9966
+    **NUEVO - Análisis IA:**
+    POST /api/analisis-ia
+    
+    Genera análisis automático
+    usando Google Gemini 2.0 Flash
+    para interpretar resultados
+end note
+
+note right of UC27 #FF9966
+    **Prompt incluye:**
+    - Datos de la ruta
+    - Parámetros del AG
+    - Historial de fitness
+    - Estadísticas
+end note
+
+note right of UC28 #FF9966
+    **Análisis generado:**
+    - Resumen ejecutivo
+    - Explicación del AG
+    - Análisis de parámetros
+    - Conclusiones
 end note
 
 note right of UC10
@@ -191,6 +245,13 @@ note right of UC25
     - Distancia total (km)
     - Orden de paradas
     - Horarios de recogida
+end note
+
+note bottom of UC31 #FF9966
+    **Exportación:**
+    - Copiar al portapapeles
+    - Descargar como .md
+    - Compartir análisis
 end note
 
 @enduml

@@ -2,23 +2,27 @@
 
 ## 🎯 Objetivo del Proyecto
 
-Sistema web completo que optimiza rutas de transporte estudiantil usando **Algoritmos Genéticos** y datos geoespaciales reales de **OpenStreetMap** para la Universidad de los Llanos en Villavicencio, Meta, Colombia.
+Sistema web completo que optimiza rutas de transporte estudiantil usando **Algoritmos Genéticos** y datos geoespaciales reales de **OpenStreetMap** para la Universidad de los Llanos en Villavicencio, Meta, Colombia. Incluye **análisis inteligente con IA (Google Gemini)** para interpretación automática de resultados.
+
+---
 
 ## 🏗️ Arquitectura del Sistema
 
 ### **Backend (Python + Flask)**
-- **API REST** en `api_rutas_reales.py`
-- **Algoritmo Genético** implementado en `genetic_algorithm.py`
-- **Cálculo de distancias reales** usando OSMnx en `data_loader.py`
-- **Base de datos de 150+ coordenadas** en `coordenadas_exactas.py`
-- **11 rutas reales** cargadas desde `rutas_reales.json`
+- **API REST** en [`api_rutas_reales.py`](backend/api_rutas_reales.py)
+- **Algoritmo Genético** implementado en [`genetic_algorithm.py`](backend/genetic_algorithm.py)
+- **Cálculo de distancias reales** usando OSMnx en [`data_loader.py`](backend/data_loader.py)
+- **Base de datos de 150+ coordenadas** en [`coordenadas_exactas.py`](backend/coordenadas_exactas.py)
+- **11 rutas reales** cargadas desde [`rutas_reales.json`](backend/rutas_reales.json)
+- **Integración con Google Gemini AI** para análisis automático
 
 ### **Frontend (React + Leaflet)**
-- **Interfaz interactiva** en `App.js`
-- **Selector de rutas** en `RouteSelector.jsx`
-- **Visualización de mapa** con Leaflet en `MapView.jsx`
-- **Panel de resultados GA** en `GeneticAlgorithmPanel.jsx`
-- **Procedimiento detallado** en `AlgorithmProcedurePanel.jsx`
+- **Interfaz interactiva** en [`App.js`](frontend/src/App.js)
+- **Selector de rutas** en [`RouteSelector.jsx`](frontend/src/components/RouteSelector.jsx)
+- **Visualización de mapa** con Leaflet en [`MapView.jsx`](frontend/src/components/MapView.jsx)
+- **Panel de resultados GA** en [`GeneticAlgorithmPanel.jsx`](frontend/src/components/GeneticAlgorithmPanel.jsx)
+- **Procedimiento detallado** en [`AlgorithmProcedurePanel.jsx`](frontend/src/components/AlgorithmProcedurePanel.jsx)
+- **Modal de Análisis IA** en [`AIAnalysisModal.jsx`](frontend/src/components/AIAnalysisModal.jsx)
 
 ---
 
@@ -32,7 +36,7 @@ Sistema web completo que optimiza rutas de transporte estudiantil usando **Algor
 - **Restricción crítica**: Primera y última parada son **FIJAS** (punto de inicio y Universidad)
 - Solo las **paradas intermedias** se optimizan
 
-### **Función de Fitness** (`fitness.py`)
+### **Función de Fitness** ([`fitness.py`](backend/fitness.py))
 ```python
 def calcular_fitness(ruta, matriz_distancias):
     distancia_total = sum(matriz[ruta[i]][ruta[i+1]] for i in range(len(ruta)-1))
@@ -43,7 +47,7 @@ def calcular_fitness(ruta, matriz_distancias):
 
 ### **Operadores Genéticos**
 
-#### 1️⃣ **Selección por Torneo**
+#### 1️⃣ **Selección por Torneo** ([`genetic_algorithm.py:160`](backend/genetic_algorithm.py))
 ```python
 def seleccion_torneo(poblacion, fitness_poblacion, k=3):
     indices = random.sample(range(len(poblacion)), k)
@@ -53,7 +57,7 @@ def seleccion_torneo(poblacion, fitness_poblacion, k=3):
 - Elige **k=3** individuos aleatorios
 - Selecciona el de **mejor fitness** (menor distancia)
 
-#### 2️⃣ **Cruce PMX** (Partially Mapped Crossover)
+#### 2️⃣ **Cruce PMX** (Partially Mapped Crossover) ([`genetic_algorithm.py:65`](backend/genetic_algorithm.py))
 ```python
 def cruce_pmx(padre1, padre2):
     # Mantiene primer y último elemento fijos
@@ -66,7 +70,7 @@ def cruce_pmx(padre1, padre2):
 - **Respeta restricciones**: inicio y fin no cambian
 - Evita duplicados mediante mapeo parcial
 
-#### 3️⃣ **Mutación por Intercambio**
+#### 3️⃣ **Mutación por Intercambio** ([`genetic_algorithm.py:134`](backend/genetic_algorithm.py))
 ```python
 def mutacion_intercambio(individuo, tasa_mutacion=0.15):
     if random.random() < tasa_mutacion:
@@ -78,7 +82,7 @@ def mutacion_intercambio(individuo, tasa_mutacion=0.15):
 - **15% de probabilidad** de mutación
 - Solo muta **paradas intermedias**, nunca inicio/fin
 
-#### 4️⃣ **Elitismo**
+#### 4️⃣ **Elitismo** ([`genetic_algorithm.py:231`](backend/genetic_algorithm.py))
 ```python
 # Preservar los 2 mejores individuos
 indices_elite = np.argsort(fitness_poblacion)[:2]
@@ -101,7 +105,7 @@ elitismo = 2             # Preservar los 2 mejores
 
 ## 🗺️ Integración con OpenStreetMap
 
-### **Cálculo de Distancias Reales** (`data_loader.py`)
+### **Cálculo de Distancias Reales** ([`data_loader.py:75`](backend/data_loader.py))
 ```python
 def matriz_distancias_osm_con_geometria(coordenadas):
     # 1. Descargar red vial de Villavicencio (15 km radius)
@@ -116,13 +120,12 @@ def matriz_distancias_osm_con_geometria(coordenadas):
             if ruta is None:
                 distancia = distancia_euclidiana(coords[i], coords[j]) * 1.3
 ```
-
 **Ventajas:**
 - ✅ Rutas siguen **calles reales**, no líneas rectas
 - ✅ Considera **un solo sentido**, semáforos, restricciones viales
 - ✅ Geometría completa de la ruta para visualización en mapa
 
-### **Geocodificación Inteligente**
+### **Geocodificación Inteligente** ([`data_loader.py:10`](backend/data_loader.py))
 ```python
 def obtener_coordenadas(direcciones):
     for direccion in direcciones:
@@ -137,11 +140,191 @@ def obtener_coordenadas(direcciones):
         # 3. ÚLTIMO RECURSO: Universidad (4.0743, -73.5831)
         return (4.0743475, -73.5831012)
 ```
-
-**Base de Datos Local** (`coordenadas_exactas.py`):
+**Base de Datos Local** ([`coordenadas_exactas.py`](backend/coordenadas_exactas.py)):
 - 150+ ubicaciones exactas de Villavicencio
 - Incluye: centros comerciales, bombas, colegios, semáforos, barrios
 - **Variaciones de nombres** (ej: "bomba terpal", "bomba terpel")
+
+---
+
+## 🤖 Integración con Google Gemini AI - NUEVA FUNCIONALIDAD
+
+### **Análisis Inteligente de Resultados**
+
+Sistema de análisis automático que interpreta los resultados de la optimización usando **Google Gemini 2.0 Flash** para proporcionar insights detallados.
+
+### **Endpoint de Análisis IA** ([`api_rutas_reales.py:291`](backend/api_rutas_reales.py))
+
+```
+POST /api/analisis-ia
+```
+
+**Datos de entrada:**
+```json
+{
+  "ruta": {
+    "ruta_id": 1,
+    "nombre": "COVISAN",
+    "numero_paradas": 7,
+    "distancia_total_km": 13.5,
+    "orden_optimizado": [0, 3, 1, 4, 2, 5, 6],
+    "historial_fitness": [15200, 14800, 14500, ...],
+    "parametros_ga": {
+      "tamano_poblacion": 100,
+      "generaciones": 200,
+      "tasa_cruce": 0.8,
+      "tasa_mutacion": 0.15,
+      "elitismo": 2
+    }
+  },
+  "estadisticas": {
+    "total_rutas": 1,
+    "distancia_total_km": 13.5
+  }
+}
+```
+
+### **Contenido del Análisis IA**
+
+El análisis generado incluye:
+
+1. **📊 Resumen Ejecutivo**
+   - Síntesis de los resultados obtenidos
+   - Significado de la optimización
+   - Mejora porcentual lograda
+
+2. **🧬 Explicación del Algoritmo Genético**
+   - Cómo funciona el AG para este problema
+   - Operadores utilizados (Torneo, PMX, Mutación, Elitismo)
+   - Justificación de diseño
+
+3. **📈 Análisis de Parámetros**
+   - Evaluación de parámetros utilizados
+   - Adecuación para el problema
+   - Sugerencias de mejora
+
+4. **🎯 Interpretación de Resultados**
+   - Análisis de la distancia obtenida
+   - Evaluación de la solución
+   - Convergencia del algoritmo
+
+5. **💡 Recomendaciones**
+   - Sugerencias para mejorar futuras optimizaciones
+   - Consideraciones prácticas de transporte
+   - Mejoras potenciales
+
+6. **🔍 Conclusiones Técnicas**
+   - Resumen de aspectos más importantes
+   - Viabilidad de implementación
+
+### **Flujo de Análisis en Frontend** ([`App.js:83`](frontend/src/App.js))
+
+```javascript
+const generarAnalisisIA = async () => {
+  if (rutasOptimizadas.length === 0) {
+    toast.warning('Primero debes optimizar una ruta');
+    return;
+  }
+
+  setCargandoIA(true);
+  setModalIAOpen(true);
+  setAnalisisIA(null);
+
+  try {
+    const response = await axios.post('/api/analisis-ia', {
+      ruta: rutasOptimizadas[0],
+      estadisticas: estadisticas
+    });
+
+    if (response.data.success) {
+      setAnalisisIA(response.data.analisis);
+      toast.success('Análisis generado correctamente');
+    }
+  } catch (error) {
+    console.error('Error generando análisis IA:', error);
+    toast.error('Error al generar el análisis');
+  } finally {
+    setCargandoIA(false);
+  }
+};
+```
+
+### **Modal de Análisis IA** ([`AIAnalysisModal.jsx`](frontend/src/components/AIAnalysisModal.jsx))
+
+**Características:**
+- 🎨 Interfaz moderna con gradient
+- 📋 Renderizado Markdown completo
+- 📋 Renderización de código con sintaxis
+- 💾 Opción para copiar análisis
+- 📥 Opción para descargar como Markdown
+- ⚙️ Indicador de carga con animación
+- 🎯 Powered by Google Gemini
+
+**Funcionalidades:**
+```javascript
+// Copiar análisis al portapapeles
+const copiarAnalisis = () => {
+  navigator.clipboard.writeText(analisis);
+  setCopiado(true);
+  setTimeout(() => setCopiado(false), 2000);
+};
+
+// Descargar análisis como archivo Markdown
+const descargarAnalisis = () => {
+  const blob = new Blob([analisis], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `analisis-ruta-${new Date().toISOString().split('T')[0]}.md`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+```
+
+### **Configuración de Gemini AI**
+
+**Requisitos:**
+1. Crear cuenta en [Google AI Studio](https://aistudio.google.com)
+2. Obtener API Key de Gemini
+3. Agregar a archivo `.env`:
+```
+GEMINI_API_KEY=tu_api_key_aqui
+```
+
+**Modelo utilizado:**
+- **gemini-2.0-flash** - Más rápido y eficiente
+
+**En `backend/api_rutas_reales.py`:**
+```python
+from google import genai
+
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+gemini_client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
+
+# En el endpoint:
+respuesta = gemini_client.models.generate_content(
+    model="gemini-2.0-flash",
+    contents=prompt
+)
+```
+
+### **Manejo de Errores**
+
+```python
+if not GEMINI_API_KEY:
+    return jsonify({
+        "error": "API Key de Gemini no configurada",
+        "message": "Configura GEMINI_API_KEY en el archivo .env"
+    }), 500
+
+if not gemini_client:
+    return jsonify({
+        "error": "Cliente de Gemini no inicializado",
+        "message": "Verifica la API Key en el archivo .env"
+    }), 500
+```
 
 ---
 
@@ -216,10 +399,17 @@ coords_optimizadas = [coords[i] for i in orden_optimizado]
     "paraderos": ["Bomba Covisan", "Campanario", ...],
     "distancia_total_km": 13.5,
     "distancia_total_metros": 13500,
+    "numero_paradas": 7,
     "orden_original": [0, 1, 2, 3, 4, 5],
     "orden_optimizado": [0, 3, 1, 4, 2, 5],
     "historial_fitness": [15200, 14800, 14500, ...],
-    "historial_detallado": [...]
+    "parametros_ga": {
+      "tamano_poblacion": 100,
+      "generaciones": 200,
+      "tasa_cruce": 0.8,
+      "tasa_mutacion": 0.15,
+      "elitismo": 2
+    }
   }],
   "estadisticas": {
     "total_rutas": 1,
@@ -229,11 +419,33 @@ coords_optimizadas = [coords[i] for i in orden_optimizado]
 }
 ```
 
+### **4. Análisis con IA** (NUEVO)
+```
+POST /api/analisis-ia
+```
+
+**Request:**
+```json
+{
+  "ruta": { /* datos de la ruta optimizada */ },
+  "estadisticas": { /* estadísticas de la optimización */ }
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "analisis": "## 📋 Resumen Ejecutivo\n\n...",
+  "mensaje": "Análisis generado correctamente con Gemini AI"
+}
+```
+
 ---
 
 ## 🎨 Interfaz de Usuario (Frontend)
 
-### **Flujo de Uso:**
+### **Flujo de Uso Completo:**
 
 1️⃣ **Cargar rutas disponibles**
 ```javascript
@@ -247,25 +459,45 @@ useEffect(() => {
 ```jsx
 <Select onChange={(e) => setRutaSeleccionada(e.target.value)}>
   {rutasDisponibles.map(ruta => (
-    <option value={ruta.id}>{ruta.nombre} ({ruta.numero_paraderos} paradas)</option>
+    <option value={ruta.id}>{ruta.nombre}</option>
   ))}
 </Select>
 ```
 
-3️⃣ **Optimizar**
+3️⃣ **Optimizar ruta**
 ```javascript
 const optimizarRuta = async (rutaId) => {
-  toast.loading('Optimizando ruta...');
   const response = await axios.get(`/api/rutas/optimizar?rutas_ids=${rutaId}`);
   setRutasOptimizadas(response.data.rutas);
-  toast.success('Ruta optimizada');
 };
 ```
 
 4️⃣ **Visualizar resultados:**
-- **Mapa Leaflet**: Polilíneas siguiendo calles reales, marcadores en cada parada
-- **Panel GA**: Distancia total, número de paradas, parámetros del algoritmo
-- **Procedimiento Detallado**: Evolución generación por generación, ejemplos de operadores
+- 🗺️ **Mapa Leaflet** - Polilíneas y marcadores
+- 📊 **Panel GA** - Distancia, parámetros
+- 📈 **Procedimiento** - Evolución generación por generación
+- 🤖 **Análisis IA** - Interpretación automática (NUEVO)
+
+5️⃣ **Generar análisis con IA** (NUEVO)
+```javascript
+const generarAnalisisIA = async () => {
+  const response = await axios.post('/api/analisis-ia', {
+    ruta: rutasOptimizadas[0],
+    estadisticas: estadisticas
+  });
+  setAnalisisIA(response.data.analisis);
+};
+```
+
+### **Componentes Principales**
+
+| Componente | Archivo | Funcionalidad |
+|-----------|---------|--------------|
+| **App** | `App.js` | Orquestación principal, estado global |
+| **MapView** | `MapView.jsx` | Visualización Leaflet, interacciones |
+| **GeneticAlgorithmPanel** | `GeneticAlgorithmPanel.jsx` | Resultados GA, botón IA |
+| **AlgorithmProcedurePanel** | `AlgorithmProcedurePanel.jsx` | Procedimiento detallado por generación |
+| **AIAnalysisModal** | `AIAnalysisModal.jsx` | Modal de análisis, Markdown rendering |
 
 ---
 
@@ -284,7 +516,7 @@ cache_geometrias = {}   # Geometrías de rutas
 - ✅ Reduce llamadas a APIs externas
 
 ### **Base de Datos Local**
-- 150+ coordenadas exactas en `coordenadas_exactas.py`
+- 150+ coordenadas exactas en [`coordenadas_exactas.py`](backend/coordenadas_exactas.py)
 - Evita geocodificación lenta de Nominatim
 - Maneja variaciones de nombres (normalización)
 
@@ -292,7 +524,7 @@ cache_geometrias = {}   # Geometrías de rutas
 
 ## 📦 Datos de Rutas Reales
 
-### **Archivo Principal:** `rutas_reales.json`
+### **Archivo Principal:** [`rutas_reales.json`](backend/rutas_reales.json)
 
 **Estructura:**
 ```json
@@ -315,7 +547,8 @@ cache_geometrias = {}   # Geometrías de rutas
         "Parqueadero frente apto del salitre",
         ...
       ]
-    }
+    },
+    ...
   ]
 }
 ```
@@ -341,11 +574,24 @@ cache_geometrias = {}   # Geometrías de rutas
 ```python
 resultado_ga = algoritmo_genetico(
     matriz_distancias=matriz,
-    tamano_poblacion=150,    # Más población = mejor solución (más lento)
+    tamano_poblacion=150,    # Más población = mejor solución
     generaciones=300,        # Más generaciones = mejor convergencia
     tasa_cruce=0.9,         # Mayor cruce = más exploración
     tasa_mutacion=0.2,      # Mayor mutación = más diversidad
     elitismo=3              # Más elite = mejor preservación
+)
+```
+
+### **Configurar Google Gemini AI**
+```python
+# En .env
+GEMINI_API_KEY=tu_api_key_aqui
+
+# En api_rutas_reales.py
+gemini_client = genai.Client(api_key=GEMINI_API_KEY)
+respuesta = gemini_client.models.generate_content(
+    model="gemini-2.0-flash",
+    contents=prompt
 )
 ```
 
@@ -362,26 +608,13 @@ G = ox.graph_from_point(
 
 ## 🧪 Testing y Validación
 
-### **Test del GA** (`test_genetic_algorithm.py`)
+### **Test del GA**
+```bash
+python backend/test_genetic_algorithm.py
+```
+
+**Validaciones:**
 ```python
-# Matriz de prueba 5x5
-matriz_test = np.array([
-    [0, 10, 15, 20, 25],
-    [10, 0, 35, 25, 30],
-    [15, 35, 0, 30, 20],
-    [20, 25, 30, 0, 15],
-    [25, 30, 20, 15, 0]
-])
-
-resultado = algoritmo_genetico(
-    matriz_distancias=matriz_test,
-    punto_inicio_idx=0,
-    punto_fin_idx=4,
-    tamano_poblacion=50,
-    generaciones=100
-)
-
-# Validaciones
 assert resultado['mejor_ruta'][0] == 0  # Comienza en 0
 assert resultado['mejor_ruta'][-1] == 4  # Termina en 4
 assert len(resultado['mejor_ruta']) == 5  # Todos los puntos presentes
@@ -405,11 +638,13 @@ assert len(resultado['mejor_ruta']) == 5  # Todos los puntos presentes
 - Memoria: ~500 MB (red OSM completa)
 - Tiempo primera ejecución: 30-60 seg/ruta
 - Tiempo con caché: 5-10 seg/ruta
+- Tiempo análisis IA: 5-15 segundos
 
 ### **Limitaciones**
 - No considera tráfico en tiempo real
 - No considera capacidad del bus
-- No considera horarios de clase (puede agregarse)
+- No considera horarios de clase (puede agregarse en [`fitness.py`](backend/fitness.py))
+- Requiere API Key de Google Gemini para análisis IA
 
 ---
 
@@ -421,7 +656,7 @@ assert len(resultado['mejor_ruta']) == 5  # Todos los puntos presentes
 3. Decisión de usar OSM para datos geoespaciales reales
 
 ### **Fase 2: Backend**
-1. Implementación del GA desde cero en `genetic_algorithm.py`
+1. Implementación del GA desde cero en [`genetic_algorithm.py`](backend/genetic_algorithm.py)
 2. Integración con OSMnx para cálculo de distancias
 3. Creación de base de datos de coordenadas exactas
 4. Desarrollo de API REST con Flask
@@ -432,15 +667,22 @@ assert len(resultado['mejor_ruta']) == 5  # Todos los puntos presentes
 3. Visualización de resultados del GA
 4. Implementación de panel de procedimiento detallado
 
-### **Fase 4: Optimización**
+### **Fase 4: Análisis IA** (NUEVA)
+1. Integración con Google Gemini AI
+2. Creación de prompts educativos y detallados
+3. Desarrollo de modal para visualización de análisis
+4. Implementación de funciones de copiar y descargar
+
+### **Fase 5: Optimización**
 1. Sistema de caché triple para reducir tiempos
 2. Geocodificación inteligente con fallbacks
 3. Mejoras en la UI/UX
 
-### **Fase 5: Testing y Documentación**
+### **Fase 6: Testing y Documentación**
 1. Tests unitarios del GA
 2. Validación con rutas reales
 3. Documentación completa
+4. Actualización de README y resumen
 
 ---
 
@@ -456,6 +698,7 @@ assert len(resultado['mejor_ruta']) == 5  # Todos los puntos presentes
 **Tecnologías clave:**
 - Algoritmos Genéticos (metaheurística)
 - OpenStreetMap (datos geoespaciales)
+- Google Gemini AI (análisis inteligente)
 - Flask + React (arquitectura web moderna)
 
 ---
@@ -465,15 +708,16 @@ assert len(resultado['mejor_ruta']) == 5  # Todos los puntos presentes
 ```
 Sistema-de-Optimizacion-de-Rutas/
 ├── backend/
-│   ├── api_rutas_reales.py              # API REST principal
+│   ├── api_rutas_reales.py              # API REST principal + Gemini IA
 │   ├── genetic_algorithm.py             # Algoritmo Genético completo
 │   ├── fitness.py                       # Función de fitness
-│   ├── data_loader.py                   # Integración OSM y geocodificación
-│   ├── coordenadas_exactas.py           # Base de datos 150+ coordenadas
+│   ├── data_loader.py                   # Integración OSM
+│   ├── coordenadas_exactas.py           # Base de datos 150+ coords
 │   ├── rutas_reales.json                # 11 rutas reales
-│   ├── rutas_loader.py                  # Carga de rutas desde JSON
+│   ├── rutas_loader.py                  # Carga de rutas
 │   ├── test_genetic_algorithm.py        # Tests unitarios
-│   └── requirements.txt                 # Dependencias Python
+│   ├── requirements.txt                 # Dependencias Python
+│   └── .env                             # GEMINI_API_KEY
 │
 ├── frontend/
 │   ├── src/
@@ -481,13 +725,21 @@ Sistema-de-Optimizacion-de-Rutas/
 │   │   ├── components/
 │   │   │   ├── MapView.jsx              # Visualización Leaflet
 │   │   │   ├── RouteSelector.jsx        # Selector de rutas
-│   │   │   ├── GeneticAlgorithmPanel.jsx # Panel resultados GA
-│   │   │   └── AlgorithmProcedurePanel.jsx # Procedimiento detallado
+│   │   │   ├── GeneticAlgorithmPanel.jsx    # Panel GA + botón IA
+│   │   │   ├── AlgorithmProcedurePanel.jsx  # Procedimiento detallado
+│   │   │   └── AIAnalysisModal.jsx      # Modal de análisis IA (NUEVO)
 │   │   └── lib/utils.js
 │   ├── package.json
 │   └── public/index.html
 │
-└── README.md                            # Documentación principal
+├── nextra/                              # Documentación interactiva
+│   ├── pages/
+│   ├── package.json
+│   └── next.config.js
+│
+├── README.md                            # Documentación principal
+├── RESUMEN_COMPLETO_PROYECTO.md         # Este archivo (actualizado)
+└── .gitignore
 ```
 
 ---
@@ -506,6 +758,38 @@ Sistema-de-Optimizacion-de-Rutas/
 
 5. **Caché Inteligente**: Sistema de tres niveles para optimizar rendimiento
 
-6. **Aplicación Práctica**: Solución real para 11 rutas de transporte universitario en Villavicencio, Colombia
+6. **Inteligencia Artificial Generativa**: Integración con Google Gemini 2.0 Flash para análisis automático
 
-**Punto diferenciador:** Usa distancias reales de calles (OSM) en lugar de distancias en línea recta, lo que hace las soluciones implementables en la realidad.
+7. **Aplicación Práctica**: Solución real para 11 rutas de transporte universitario en Villavicencio, Colombia
+
+**Punto diferenciador:** Usa distancias reales de calles (OSM) en lugar de distancias en línea recta, lo que hace las soluciones implementables en la realidad. Además, genera análisis inteligentes automáticos.
+
+---
+
+## ✨ Características Nuevas - Análisis con IA
+
+### 🤖 Análisis Automático con Google Gemini
+
+**Características:**
+- ✅ Análisis educativo y detallado
+- ✅ Explicación del algoritmo genético
+- ✅ Interpretación de resultados
+- ✅ Sugerencias de mejora
+- ✅ Formato Markdown profesional
+
+**Interfaz Usuario:**
+- ✅ Modal interactivo con carga de IA
+- ✅ Renderizado Markdown completo
+- ✅ Botones para copiar análisis
+- ✅ Opción para descargar como archivo
+
+**Integración:**
+- ✅ Endpoint POST `/api/analisis-ia`
+- ✅ Componente `AIAnalysisModal.jsx`
+- ✅ Manejo de errores y configuración
+
+---
+
+**Última actualización:** Noviembre 2024
+**Versión:** 2.0 - Con análisis IA integrado
+**Mantenedor:** Equipo de Desarrollo del Proyecto

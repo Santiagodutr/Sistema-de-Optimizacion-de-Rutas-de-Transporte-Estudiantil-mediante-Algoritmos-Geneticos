@@ -5,8 +5,4 @@ const withNextra = require('nextra')({
 
 module.exports = withNextra({
   reactStrictMode: true,
-  server: {
-    port: 3001,
-    host: 'localhost'
-  }
 })

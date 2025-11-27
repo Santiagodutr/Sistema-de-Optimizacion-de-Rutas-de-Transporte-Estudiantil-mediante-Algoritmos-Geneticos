@@ -1,0 +1,83 @@
+@startuml Secuencia - Análisis IA Detallado v2.0
+
+participant Usuario as U
+participant Frontend as F
+participant Backend as B
+participant GeminiAPI as G
+participant MapComponent as M
+
+autonumber
+
+U -> F: Hace clic en "Generar Análisis IA"
+F -> F: Desactiva botón (cargando = true)
+F -> F: Muestra spinner de carga
+
+F -> B: POST /api/analisis-ia\n{resultados_ga}
+
+B -> B: Valida datos recibidos
+B -> B: Construye prompt contextualizado:\n- Datos de paradas\n- Parámetros del AG\n- Historial fitness\n- Estadísticas
+
+B -> G: Envía prompt a Google Gemini 2.0 Flash
+note right of B
+    Prompt incluye:
+    - Descripción del problema
+    - Datos de entrada
+    - Resultados del GA
+    - Solicitud de análisis
+end note
+
+G -> G: Procesa con modelo Gemini
+G -> G: Genera análisis completo:\n- Resumen ejecutivo\n- Explicación del algoritmo\n- Análisis de parámetros\n- Recomendaciones\n- Conclusiones
+
+G -> B: Retorna texto en Markdown
+
+B -> B: Valida respuesta
+B -> B: Formatea JSON con análisis
+B -> B: Estructura respuesta:\n{\n  status: 'success',\n  analisis_markdown: '...',\n  timestamp: now\n}
+
+B -> F: Retorna 200 OK + análisis
+
+F -> F: Parsea respuesta JSON
+F -> F: Extrae texto markdown
+F -> F: Actualiza estado:\n- analisisIA = datos\n- modalIA = true
+F -> F: Detiene spinner
+
+F -> U: Abre Modal con Análisis
+
+M -> M: Renderiza Markdown
+M -> M: Convierte títulos, negrita,\nlistas, código, etc.
+
+U -> F: Lee análisis en modal
+U -> F: Hace clic en "Copiar"
+
+F -> F: Copia markdown al\nportapapeles (clipboard API)
+F -> U: Muestra toast:\n"Copiado al portapapeles"
+
+U -> F: Hace clic en "Descargar"
+
+F -> F: Crea blob de texto
+F -> F: Genera nombre archivo:\nanalisis-{fecha-hora}.md
+F -> F: Dispara descarga
+F -> U: Archivo .md descargado
+
+U -> F: Hace clic en X o "Cerrar"
+
+F -> F: Actualiza estado:\n- modalIA = false
+F -> U: Modal cerrado
+
+note over U, G
+    **Flujo Completo del Análisis IA (v2.0):**
+    
+    1. Usuario inicia análisis
+    2. Frontend envía resultados GA
+    3. Backend construye prompt rico
+    4. Google Gemini analiza
+    5. Modal muestra análisis Markdown
+    6. Usuario puede copiar/descargar
+    7. Experiencia integrada UX
+    
+    **Tiempo típico:** 3-5 segundos
+    **Dependencia:** Conexión internet + API key Gemini
+end note
+
+@enduml
