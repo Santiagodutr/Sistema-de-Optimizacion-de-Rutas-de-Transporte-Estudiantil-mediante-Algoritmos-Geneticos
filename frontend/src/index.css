@@ -65,3 +65,59 @@
 .leaflet-container {
   font-family: 'Inter', system-ui, sans-serif;
 }
+
+/* Custom bus marker animation */
+.bus-marker {
+  animation: pulse-bus 2s infinite;
+}
+
+@keyframes pulse-bus {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* Custom range slider for animation controls */
+input[type="range"].animation-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  background: transparent;
+  cursor: pointer;
+}
+
+input[type="range"].animation-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+  border: 2px solid white;
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+input[type="range"].animation-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+}
+
+input[type="range"].animation-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+  border: 2px solid white;
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+/* Smooth transitions for map elements */
+.leaflet-marker-icon {
+  transition: transform 0.1s ease-out;
+}
