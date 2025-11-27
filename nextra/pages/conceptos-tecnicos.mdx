@@ -111,6 +111,87 @@ Proporciona distancias reales siguiendo calles, no líneas rectas.
 
 ---
 
+## Análisis Automático con Google Gemini (NUEVO v2.0)
+
+### Qué es
+
+Sistema de inteligencia artificial que analiza automáticamente los resultados del algoritmo genético.
+
+### Integración Google Gemini
+
+Google Gemini 2.0 Flash es un modelo de lenguaje grande de Google que puede:
+
+- Analizar datos complejos de optimización
+- Generar explicaciones en lenguaje natural
+- Proporcionar recomendaciones basadas en IA
+- Producir documentación automática
+
+### Flujo de Análisis
+
+1. **Usuario solicita análisis** desde el panel de resultados
+2. **Frontend envía datos** al backend con resultados del GA
+3. **Backend construye prompt** con:
+   - Información de las rutas
+   - Parámetros del algoritmo usado
+   - Historial de evolución del fitness
+   - Estadísticas de mejora
+4. **Llamada a Gemini** mediante Google API
+5. **Procesamiento IA** genera análisis completo
+6. **Respuesta en Markdown** con:
+   - Resumen ejecutivo
+   - Explicación del algoritmo
+   - Análisis de parámetros
+   - Recomendaciones de mejora
+   - Conclusiones
+7. **Modal interactivo** muestra análisis formateado
+
+### Ventajas de la Integración IA
+
+| Ventaja | Descripción |
+|---------|-------------|
+| **Automatización** | No requiere análisis manual |
+| **Inteligencia** | Comprende contexto y mejora propuestas |
+| **Explicabilidad** | Genera explicaciones claras del AG |
+| **Documentación** | Crea reportes listos para usar |
+| **Velocidad** | Análisis en 3-5 segundos |
+
+### Especificaciones Técnicas
+
+**Modelo:** `gemini-2.0-flash`
+
+- Velocidad: ~1-3 segundos por análisis
+- Tokens: ~500-1000 tokens entrada/salida
+- Disponibilidad: API Key requerida
+- Coste: ~$0.10 USD por 1M tokens
+
+### Ejemplo de Salida
+
+```markdown
+# Análisis de Optimización - Ruta Central
+
+## Resumen Ejecutivo
+Se optimizó la ruta central mejorando
+la distancia en 15% (de 12.5km a 10.6km).
+
+## Explicación del Algoritmo
+Se utilizó AG con población de 100...
+
+## Recomendaciones
+1. Considerar reordenamiento por horario
+2. Validar paradas nuevas...
+3. Monitorear cambios de tráfico...
+```
+
+### Limitaciones y Consideraciones
+
+- Requiere conexión a internet
+- Depends on Google API availability
+- Rate limiting: 60 req/min (free tier)
+- API Key debe mantenerse segura
+- Respuestas pueden variar por natura de IA
+
+---
+
 ## Parámetros del Algoritmo
 
 ### Configuración Actual

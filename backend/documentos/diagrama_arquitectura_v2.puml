@@ -1,0 +1,258 @@
+@startuml Arquitectura - Sistema Optimización de Rutas v2.0 (Con IA)
+
+!define PRIMARY_COLOR #4CAF50
+!define SECONDARY_COLOR #2196F3
+!define TERTIARY_COLOR #FF9800
+!define QUATERNARY_COLOR #9C27B0
+
+' === CAPAS ===
+
+cloud "Internet / APIs Externas" as Internet
+
+' Frontend
+rectangle "FRONTEND - React 18 (Port 3000)" <<Frontend>> as FrontendLayer {
+    component "App.js (Principal)" as App #E3F2FD
+    component "RouteSelector.jsx" as RouteSelector #E3F2FD
+    component "MapView.jsx (Leaflet)" as MapView #E3F2FD
+    component "GeneticAlgorithmPanel.jsx" as GAPanel #E3F2FD
+    component "AlgorithmProcedurePanel.jsx" as AlgPanel #E3F2FD
+    component "AIAnalysisModal.jsx (NUEVO)" as AIModal #E3F4FF
+    component "ApiClient (Axios)" as ApiClient #E3F2FD
+    component "UI Components" as UIComp #E3F2FD
+}
+
+' API REST
+rectangle "API REST - Flask (Port 5000)" <<API>> as APILayer {
+    component "Flask App" as FlaskApp #FFF3E0
+    component "CORS Middleware" as CORS #FFF3E0
+    
+    rectangle "Route Handlers" as Routes {
+        component "/api/health" as Health #FFCCBC
+        component "/api/rutas/info" as RutasInfo #FFCCBC
+        component "/api/rutas/optimizar" as OptimizeEndpoint #FFCCBC
+        component "/api/analisis-ia (NUEVO)" as AnalisisIAEndpoint #FFE0B2
+    }
+}
+
+' Backend Processing
+rectangle "BACKEND - Procesamiento (Python)" <<Backend>> as BackendLayer {
+    
+    rectangle "Gestión de Datos" as DataMgmt {
+        component "DataLoader" as DataLoader #E8F5E9
+        component "RutasLoader" as RutasLoader #E8F5E9
+        component "CoordenadaHandler" as CoordHandler #E8F5E9
+    }
+    
+    rectangle "Cálculo de Distancias" as DistanceCalc {
+        component "CalculadoraDistancias" as DistanceCalc #E8F5E9
+        component "Cache Manager" as CacheManager #E8F5E9
+    }
+    
+    rectangle "Optimización (AG)" as GAModule {
+        component "GeneticAlgorithm" as GA #E8F5E9
+        component "FitnessCalculator" as Fitness #E8F5E9
+    }
+    
+    rectangle "Análisis con IA (NUEVO)" as AIModule {
+        component "GeminiAIAnalyzer" as GeminiAnalyzer #E8F4FF
+        component "PromptBuilder" as PromptBuilder #E8F4FF
+    }
+}
+
+' Caché
+rectangle "CACHÉ - Triple Nivel" as CacheLayer {
+    database "Coordenadas\nGeocodificadas" as CacheCoords #F3E5F5
+    database "Matrices de\nDistancias" as CacheMatrices #F3E5F5
+    database "Geometrías de\nCalles" as CacheGeometries #F3E5F5
+}
+
+' Datos Persistentes
+rectangle "DATOS - Local (JSON)" as DataLayer {
+    database "rutas_reales.json\n(11 rutas, 150+ paradas)" as RoutesDB #FFFFFF
+    database "coordenadas_exactas.py\n(150+ paraderos predefinidos)" as CoordsDB #FFFFFF
+}
+
+' APIs Externas
+rectangle "SERVICIOS EXTERNOS" as ExternalServices {
+    cloud "OpenStreetMap\n(OSM)" as OSM #F0F4C3
+    cloud "Nominatim\n(Geocoding)" as Nominatim #F0F4C3
+    cloud "Google Gemini\n2.0 Flash (NUEVO)" as Gemini #FFE0B2
+}
+
+' === FLUJOS PRINCIPALES ===
+
+' Frontend - API REST
+App --> ApiClient : usa
+RouteSelector --> App : propiedades
+MapView --> App : propiedades
+GAPanel --> App : propiedades
+AlgPanel --> App : propiedades
+AIModal --> App : propiedades [NEW]
+UIComp --> App : propiedades
+
+ApiClient --> FlaskApp : HTTP requests
+ApiClient --> CORS : origin check
+
+CORS --> FlaskApp : allow requests
+
+FlaskApp --> Health : GET /api/health
+FlaskApp --> RutasInfo : GET /api/rutas/info
+FlaskApp --> OptimizeEndpoint : GET /api/rutas/optimizar
+FlaskApp --> AnalisisIAEndpoint : POST /api/analisis-ia [NEW]
+
+' Endpoints to Backend Components
+RutasInfo --> DataMgmt : carga datos
+OptimizeEndpoint --> DataMgmt : obtiene rutas
+OptimizeEndpoint --> DistanceCalc : calcula distancias
+OptimizeEndpoint --> GAModule : optimiza
+AnalisisIAEndpoint --> AIModule : genera análisis [NEW]
+AnalisisIAEndpoint --> GAModule : obtiene resultados [NEW]
+
+' Backend to Cache
+DataMgmt --> CacheManager : usa caché
+DistanceCalc --> CacheManager : usa caché
+GAModule --> CacheManager : usa caché
+
+' Cache to Storage
+CacheManager --> CacheCoords : lee/escribe
+CacheManager --> CacheMatrices : lee/escribe
+CacheManager --> CacheGeometries : lee/escribe
+
+' Backend to Data
+DataMgmt --> RoutesDB : lee
+DataMgmt --> CoordsDB : lee
+CoordHandler --> CoordsDB : consulta coordenadas exactas
+
+' Backend to External APIs
+DistanceCalc --> OSM : descarga red vial
+DistanceCalc --> Nominatim : consulta geometría
+CoordHandler --> Nominatim : geocodifica direcciones
+GeminiAnalyzer --> Gemini : envía prompt [NEW]
+Gemini --> GeminiAnalyzer : retorna análisis [NEW]
+
+' Response Flow
+GA --> OptimizeEndpoint : retorna mejor ruta
+GeminiAnalyzer --> AnalisisIAEndpoint : retorna análisis [NEW]
+OptimizeEndpoint --> ApiClient : JSON response
+AnalisisIAEndpoint --> ApiClient : JSON response [NEW]
+ApiClient --> MapView : coordenadas
+ApiClient --> GAPanel : resultados
+ApiClient --> AlgPanel : historial fitness
+ApiClient --> AIModal : análisis markdown [NEW]
+
+' === NOTAS ===
+
+note bottom of FrontendLayer
+    **Frontend Stack:**
+    - React 18.2.0
+    - Leaflet (mapas)
+    - Tailwind CSS
+    - Axios (HTTP)
+    - Toast notifications
+    - Markdown renderer [NEW]
+end note
+
+note bottom of APILayer
+    **API Stack:**
+    - Flask
+    - Flask-CORS
+    - REST endpoints
+    - JSON serialization
+end note
+
+note bottom of BackendLayer
+    **Backend Stack:**
+    - Python 3.8+
+    - numpy (matrices)
+    - geopy (geocoding)
+    - OSMnx (OpenStreetMap)
+    - Google Gemini SDK [NEW]
+end note
+
+note right of AIModule #FFE0B2
+    **NUEVO en v2.0:**
+    Análisis automático con IA
+    Google Gemini 2.0 Flash
+    - Inteligencia artificial
+    - Procesamiento natural
+    - Recomendaciones
+    - Markdown output
+end note
+
+note right of GeminiAnalyzer #FFE0B2
+    **Gemini Integration:**
+    - Construye prompt detallado
+    - Envía a API Google
+    - Procesa respuesta
+    - Formatea Markdown
+end note
+
+note right of CacheLayer
+    **Caché de 3 niveles:**
+    
+    1. Coordenadas: evita
+       geocodificaciones repetidas
+    
+    2. Matrices: reduce
+       cálculos de distancias
+    
+    3. Geometrías: mejora
+       rendering del mapa
+    
+    Ahorro: 30-60 segundos/ejecución
+end note
+
+note right of CacheManager
+    **Estrategia:**
+    - Hash como clave
+    - Invalidación manual
+    - Estadísticas de uso
+    - Limite de memoria
+end note
+
+note left of OSM
+    **Uso:**
+    - Red vial de Villavicencio
+    - Distancias reales
+    - Rutas por calles
+end note
+
+note left of Nominatim
+    **Geocoding:**
+    - Dirección → (lat, lon)
+    - Fallback de caché
+    - Rate limiting
+end note
+
+note left of RoutesDB #CCCCCC
+    **Datos Locales:**
+    - 11 rutas universitarias
+    - 150+ paradas definidas
+    - Información de horarios
+    - Datos de capacidad
+end note
+
+' === INFORMACIÓN GENERAL ===
+
+note bottom of ExternalServices #FFFACD
+    **Dependencias Externas:**
+    ✓ OpenStreetMap (Gratuito)
+    ✓ Nominatim (Gratuito)
+    ✓ Google Gemini (API Key requerido) [NEW]
+    
+    Nota: Sistema requiere internet
+    para todas las operaciones
+end note
+
+legend right #F0F0F0
+    |=| Componente |
+    |<#E3F2FD> Frontend |
+    |<#FFF3E0> API REST |
+    |<#E8F5E9> Backend Processing |
+    |<#F3E5F5> Cache Layer |
+    |<#FFFFFF> Datos Persistentes |
+    |<#F0F4C3> APIs Externas |
+    |<#FFE0B2> NUEVO en v2.0 |
+endlegend
+
+@enduml
