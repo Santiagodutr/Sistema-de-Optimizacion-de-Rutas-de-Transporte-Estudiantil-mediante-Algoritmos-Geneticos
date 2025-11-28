@@ -1,0 +1,76 @@
+@startuml diagrama_arquitectura_backend
+title Arquitectura - Backend (Sistema de Optimización de Rutas)
+skinparam componentStyle rectangle
+left to right direction
+skinparam shadowing false
+skinparam packageStyle rect
+
+' Único actor (usuario) a la izquierda
+actor "Usuario" as User #lightblue
+
+' Backend central: paquetes y módulos (estilo cajas grandes)
+package "Backend (Python - Flask)" as BACK <<Rectangle>> #F6FFF0 {
+  rectangle "Flask API\napi_rutas_reales.py" as API #E8FFE8
+
+  package "Módulos principales" as MODS #FFFFFF {
+    component "rutas_loader.py\n- cargar_rutas_reales()\n- obtener_todas_las_rutas()" as RutasLoader #FFFFEE
+    component "data_loader.py\n- obtener_coordenadas()\n- matriz_distancias_osm_con_geometria()" as DataLoader #FFFFEE
+    component "coordenadas_exactas.py\n- COORDENADAS_EXACTAS\n- buscar_coordenada_exacta()" as CoordExactas #FFFFEE
+    component "genetic_algorithm.py\n- algoritmo_genetico()\n- cruce_pmx(), seleccion_torneo()" as GA #FFFFEE
+    component "fitness.py\n- calcular_fitness()\n- evaluar_poblacion()" as Fitness #FFFFEE
+  }
+
+  package "Caches y Datos" as DATA #FFF8E6 {
+    component "Cache en memoria\n(cache_coordenadas, cache_matrices, cache_geometrias)" as CacheMem #FFF5E6
+    component "rutas_reales.json\n(datos de entrada)" as RutasFile #FFF5E6
+  }
+}
+
+' Servicios externos a la derecha
+package "Servicios Externos" as EXTS #F0F7FF {
+  component "OpenStreetMap (Tiles)" as OSMTiles #FFFFFF
+  component "Nominatim (geocoding - geopy)" as Nominatim #FFFFFF
+  component "OSMnx (graph & routing)" as OSMnx #FFFFFF
+  component "Google Gemini (genai)" as Gemini #FFFFFF
+}
+
+' Relaciones principales (flechas claras)
+User -[#2B6CB0]-> API : Solicita optimización / análisis
+
+API --> RutasLoader : leer rutas (rutas_reales.json)
+API --> DataLoader : geocoding + matriz de distancias + geometrías
+DataLoader --> CoordExactas : buscar_coordenada_exacta (fallback rápido)
+DataLoader --> OSMnx : graph_from_point, route_to_gdf, shortest_path
+DataLoader --> Nominatim : geocode (via geopy)
+
+API --> GA : algoritmo_genetico(matriz_distancias, params)
+GA --> Fitness : calcular_fitness / evaluar_poblacion
+
+API --> CacheMem : leer/guardar cache_* (optimización)
+RutasLoader --> RutasFile : carga JSON de rutas
+
+API -[#FFAA00]-> Gemini : POST prompt -> generate_content (GEMINI_API_KEY)
+
+' Notas con tecnologías y runtime
+note right of BACK
+  Runtime: Python 3.x
+  Framework: Flask + Flask-CORS
+  Dependencias clave:
+  - osmnx (routing), geopy (Nominatim), numpy
+  - python-dotenv, google-genai (Gemini)
+  Variables de entorno importantes: GEMINI_API_KEY
+end note
+
+note left of BACK
+  Arquitectura:
+  - Endpoints: /api/rutas/info, /api/rutas/optimizar, /api/analisis-ia
+  - Caches: `cache_coordenadas`, `cache_matrices`, `cache_geometrias`
+  - Salida principal: rutas optimizadas con `geometria_completa` (polylines)
+end note
+
+' Visual tuning
+skinparam packageBorderColor #9CA3AF
+skinparam componentBorderColor #94A3B8
+skinparam noteBackgroundColor #FFFEE0
+
+@enduml

@@ -1,257 +1,101 @@
-@startuml Casos de Uso - Sistema de Optimización de Rutas con IA
 
+@startuml diagrama_casos_uso
+title Diagrama de Casos de Uso - Usuario (Frontend)
 left to right direction
-skinparam packageStyle rectangle
 skinparam usecase {
-    BackgroundColor #F8F8F8
-    BorderColor #666
-    FontStyle bold
+	BackgroundColor<<Rutas>> LightBlue
+	BorderColor <<Rutas>> #2B6CB0
+	BackgroundColor<<Optimizacion>> #FEF3C7
+	BorderColor <<Optimizacion>> #D97706
+	BackgroundColor<<Animacion>> #ECFDF5
+	BorderColor <<Animacion>> #10B981
+	BackgroundColor<<IA>> #F5F3FF
+	BorderColor <<IA>> #7C3AED
+	BackgroundColor<<Exportar>> #FFF7ED
+	BorderColor <<Exportar>> #FB923C
 }
 
-' Actores
-actor "Usuario\nAdministrador" as Admin
-actor "Sistema\nFrontend" as Frontend
-actor "OpenStreetMap\nAPI" as OSM
-actor "Geopy\nGeocoder" as Geocoder
-actor "Google Gemini\nAI" as Gemini
+actor "Usuario" as User
 
-' Sistema
-rectangle "Sistema de Optimización de Rutas de Transporte Estudiantil v2.0" {
-    
-    ' Casos de Uso - Gestión de Rutas
-    package "Gestión de Rutas" {
-        usecase (Consultar información\nde rutas disponibles) as UC1
-        usecase (Seleccionar rutas\na optimizar) as UC2
-        usecase (Obtener todas\nlas paradas) as UC3
-        usecase (Consultar información\nde ruta específica) as UC4
-    }
-    
-    ' Casos de Uso - Geocodificación
-    package "Geocodificación y Mapeo" {
-        usecase (Geocodificar\ndirecciones) as UC5
-        usecase (Buscar coordenadas\nexactas en BD local) as UC6
-        usecase (Obtener coordenadas\ndesde OpenStreetMap) as UC7
-        usecase (Aplicar coordenadas\nfallback) as UC8
-    }
-    
-    ' Casos de Uso - Cálculo de Distancias
-    package "Cálculo de Distancias" {
-        usecase (Descargar red vial\nde OSM) as UC9
-        usecase (Calcular matriz\nde distancias) as UC10
-        usecase (Calcular geometría\nde rutas por calles) as UC11
-        usecase (Usar caché de\nmatrices) as UC12
-    }
-    
-    ' Casos de Uso - Optimización
-    package "Optimización con Algoritmo Genético" {
-        usecase (Crear población\ninicial) as UC13
-        usecase (Evaluar fitness\nde población) as UC14
-        usecase (Ejecutar selección\npor torneo) as UC15
-        usecase (Aplicar cruce PMX) as UC16
-        usecase (Aplicar mutación\npor intercambio) as UC17
-        usecase (Aplicar elitismo) as UC18
-        usecase (Evolucionar\ngeneraciones) as UC19
-        usecase (Retornar mejor\nruta optimizada) as UC20
-    }
-    
-    ' Casos de Uso - API REST
-    package "Servicios API REST" {
-        usecase (Verificar estado\ndel servidor) as UC21
-        usecase (Obtener información\nbásica de rutas) as UC22
-        usecase (Optimizar todas\nlas rutas) as UC23
-        usecase (Optimizar rutas\nseleccionadas) as UC24
-        usecase (Retornar resultados\ncon geometría) as UC25
-    }
-    
-    ' Casos de Uso - Análisis con IA (NUEVO)
-    package "Análisis Inteligente con IA" {
-        usecase (Generar análisis\ncon Google Gemini) as UC26
-        usecase (Construir prompt\ndetallado) as UC27
-        usecase (Interpretar resultados\ndel GA) as UC28
-        usecase (Generar recomendaciones) as UC29
-        usecase (Renderizar análisis\nen Markdown) as UC30
-        usecase (Exportar análisis\n(copiar/descargar)) as UC31
-    }
-    
-    ' Casos de Uso - Caché y Rendimiento
-    package "Caché y Optimización" {
-        usecase (Almacenar coordenadas\nen caché) as UC32
-        usecase (Almacenar matrices\nen caché) as UC33
-        usecase (Almacenar geometrías\nen caché) as UC34
-    }
+' Agrupar casos de uso por áreas funcionales
+package "Rutas" {
+	usecase "1. Ver lista de rutas" as UC_ListRutas <<Rutas>>
+	usecase "2. Seleccionar ruta" as UC_SelectRuta <<Rutas>>
+	usecase "3. Ver detalles de ruta (paradas, horarios)" as UC_VerDetalles <<Rutas>>
+	usecase "4. Centrar mapa en parada/ruta" as UC_CentrarMapa <<Rutas>>
 }
 
-' === RELACIONES PRINCIPALES ===
+package "Optimización" {
+	usecase "5. Configurar parámetros del algoritmo" as UC_ConfigParams <<Optimizacion>>
+	usecase "6. Iniciar optimización de ruta" as UC_IniciarOpt <<Optimizacion>>
+	usecase "7. Ver progreso de optimización" as UC_VerProgreso <<Optimizacion>>
+	usecase "8. Ver resultados optimizados" as UC_VerResultados <<Optimizacion>>
+}
 
-' Usuario/Admin interactúa con API
-Admin --> UC21
-Admin --> UC22
-Admin --> UC23
-Admin --> UC24
-Admin --> UC26
+package "Animación" {
+	usecase "9. Animar recorrido optimizado" as UC_Animar <<Animacion>>
+	usecase "10. Controlar reproducción (play/pause/stop)" as UC_Control <<Animacion>>
+	usecase "11. Ajustar velocidad de animación" as UC_Velocidad <<Animacion>>
+}
 
-' Frontend consume la API
-Frontend --> UC21
-Frontend --> UC22
-Frontend --> UC23
-Frontend --> UC24
-Frontend --> UC26
+package "Análisis con IA" {
+	usecase "12. Solicitar análisis automático (IA)" as UC_SolicitarIA <<IA>>
+	usecase "13. Ver análisis en modal" as UC_VerIA <<IA>>
+}
 
-' Flujo de Consulta de Información
-UC1 ..> UC3 : <<include>>
-UC22 ..> UC1 : <<include>>
-UC4 ..> UC3 : <<include>>
+package "Exportar / Compartir" {
+	usecase "14. Descargar análisis (Markdown)" as UC_Download <<Exportar>>
+	usecase "15. Copiar análisis al portapapeles" as UC_Copy <<Exportar>>
+	usecase "16. Exportar ruta / polilínea" as UC_ExportRuta <<Exportar>>
+}
 
-' Flujo de Optimización Completa
-UC23 ..> UC2 : <<include>>
-UC24 ..> UC2 : <<include>>
-UC23 ..> UC5 : <<include>>
-UC24 ..> UC5 : <<include>>
-UC23 ..> UC10 : <<include>>
-UC24 ..> UC10 : <<include>>
-UC23 ..> UC19 : <<include>>
-UC24 ..> UC19 : <<include>>
-UC23 ..> UC25 : <<include>>
-UC24 ..> UC25 : <<include>>
+' Relaciones actor -> casos de uso (acciones del usuario)
+User --> UC_ListRutas
 
-' Flujo de Análisis IA (NUEVO)
-UC26 ..> UC27 : <<include>>
-UC27 ..> UC28 : <<include>>
-UC28 ..> UC29 : <<include>>
-UC29 ..> UC30 : <<include>>
-UC30 ..> UC31 : <<include>>
-UC26 --> Gemini : <<use>>
+' Flujo secuencial (orden de uso típico)
+UC_ListRutas --> UC_SelectRuta
+UC_SelectRuta --> UC_VerDetalles
+UC_VerDetalles --> UC_CentrarMapa
+UC_VerDetalles --> UC_ConfigParams
+UC_ConfigParams --> UC_IniciarOpt
+UC_IniciarOpt --> UC_VerProgreso
+UC_VerProgreso --> UC_VerResultados
+UC_VerResultados --> UC_Animar
+UC_Animar --> UC_Control
+UC_Control --> UC_Velocidad
 
-' Flujo de Geocodificación
-UC5 ..> UC6 : <<include>>
-UC5 ..> UC7 : <<extend>>
-UC5 ..> UC8 : <<extend>>
-UC7 --> Geocoder : <<use>>
+' Después de ver resultados: opcional solicitar IA o exportar
+UC_VerResults_OptionalStart = UC_VerResultados
+UC_VerResults_OptionalStart --> UC_SolicitarIA
+UC_SolicitarIA --> UC_VerIA
+UC_VerIA --> UC_Download
+UC_VerIA --> UC_Copy
+UC_VerResultados --> UC_ExportRuta
 
-' Flujo de Cálculo de Distancias
-UC10 ..> UC9 : <<include>>
-UC10 ..> UC11 : <<include>>
-UC10 ..> UC12 : <<extend>>
-UC9 --> OSM : <<use>>
-UC11 --> OSM : <<use>>
+' Conexiones del actor a las acciones principales (acceso directo)
+User --> UC_SelectRuta
+User --> UC_ConfigParams
+User --> UC_IniciarOpt
+User --> UC_Animar
+User --> UC_SolicitarIA
+User --> UC_Download
+User --> UC_ExportRuta
 
-' Flujo del Algoritmo Genético
-UC19 ..> UC13 : <<include>>
-UC19 ..> UC14 : <<include>>
-UC19 ..> UC15 : <<include>>
-UC19 ..> UC16 : <<include>>
-UC19 ..> UC17 : <<include>>
-UC19 ..> UC18 : <<include>>
-UC19 ..> UC20 : <<include>>
-
-' Flujo de Caché
-UC5 ..> UC32 : <<extend>>
-UC10 ..> UC33 : <<extend>>
-UC11 ..> UC34 : <<extend>>
-
-' Relación AG con Análisis IA
-UC20 ..> UC26 : <<extend>>
-
-' === NOTAS EXPLICATIVAS ===
-
-note right of UC23
-    **Parámetros:**
-    GET /api/rutas/optimizar
-    
-    **Proceso:**
-    1. Carga todas las rutas
-    2. Geocodifica paraderos
-    3. Calcula distancias reales
-    4. Optimiza con AG
-    5. Retorna JSON con resultados
+' Notas de ayuda para aclarar acciones (no técnicas)
+note right of UC_IniciarOpt
+	El usuario selecciona una ruta y pulsa "Optimizar".
+	Puede ajustar parámetros (población, generaciones, tasas).
 end note
 
-note right of UC24
-    **Parámetros:**
-    GET /api/rutas/optimizar?rutas_ids=1,2,3
-    
-    **Beneficio:**
-    Permite optimizar solo
-    rutas específicas para
-    reducir tiempo de cálculo
+note right of UC_Animar
+	La animación muestra el recorrido optimizado sobre el mapa
+	con una línea destacada y controles de reproducción.
 end note
 
-note bottom of UC19
-    **Parámetros del AG:**
-    - Población: 100 individuos
-    - Generaciones: 200
-    - Tasa cruce: 0.8
-    - Tasa mutación: 0.15
-    - Elitismo: 2
-end note
-
-note right of UC26 #FF9966
-    **NUEVO - Análisis IA:**
-    POST /api/analisis-ia
-    
-    Genera análisis automático
-    usando Google Gemini 2.0 Flash
-    para interpretar resultados
-end note
-
-note right of UC27 #FF9966
-    **Prompt incluye:**
-    - Datos de la ruta
-    - Parámetros del AG
-    - Historial de fitness
-    - Estadísticas
-end note
-
-note right of UC28 #FF9966
-    **Análisis generado:**
-    - Resumen ejecutivo
-    - Explicación del AG
-    - Análisis de parámetros
-    - Conclusiones
-end note
-
-note right of UC10
-    **Resultado:**
-    Matriz NxN con distancias
-    reales en metros usando
-    red vial de OSM
-end note
-
-note left of UC6
-    **Base de datos local:**
-    COORDENADAS_EXACTAS
-    con +150 paraderos
-    predefinidos
-end note
-
-note bottom of UC12
-    **Optimización:**
-    Evita recalcular matrices
-    para las mismas coordenadas
-    (ahorro de ~30-60 seg)
-end note
-
-note right of UC16
-    **Cruce PMX:**
-    Partially Mapped Crossover
-    Mantiene primer y último
-    punto fijos (Universidad)
-end note
-
-note right of UC25
-    **Respuesta incluye:**
-    - Coordenadas optimizadas
-    - Geometría de calles reales
-    - Distancia total (km)
-    - Orden de paradas
-    - Horarios de recogida
-end note
-
-note bottom of UC31 #FF9966
-    **Exportación:**
-    - Copiar al portapapeles
-    - Descargar como .md
-    - Compartir análisis
+note left of UC_SolicitarIA
+	El análisis con IA devuelve un informe en Markdown
+	y se muestra en un modal con opciones de copia/descarga.
 end note
 
 @enduml
+
