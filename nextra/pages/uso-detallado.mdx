@@ -23,26 +23,16 @@ Es la primera sección visible al abrir la aplicación.
 
 Después de seleccionar, verás:
 
-<div style={{ textAlign: 'center', margin: '30px 0' }}>
-  <img 
-    src="/images/Informacionderuta.png" 
-    alt="Información de Rutas"
-    style={{ maxWidth: '500px', width: '100%', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
-  />
-</div>
+![Informcaion](/images/Informacionderuta.png)
 
 - Nombre de la ruta
 - Número exacto de paradas
+- Configurar Recorrido
+- Parametros de Algoritmos Geneticos
 
 #### Botón Optimizar Ruta
+![Botón Optimizar Ruta](/images/Boton_OptiRut.png)
 
-<div style={{ textAlign: 'center', margin: '30px 0' }}>
-  <img 
-    src="/images/OptimizarBotpn.png" 
-    alt="Botón de Optimizar"
-    style={{ maxWidth: '500px', width: '100%', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
-  />
-</div>
 
 **Estados del botón:**
 - Azul normal: Listo para optimizar
@@ -123,6 +113,43 @@ Mejor: 14,714 km
 Promedio: 18,211 km
 Peor: 20,62 km
 ```
+
+---
+
+## Panel de Análisis con IA ✨
+
+### Ubicación
+Botón "Análisis con IA" en el panel de procedimiento (parte inferior)
+![BotonIa](/images/botonIa.png)
+
+### ¿Qué hace?
+Genera automáticamente un análisis inteligente de los resultados usando Google Gemini. Incluye:
+![InformacionIa](/images/InformacionIa.png)
+- Resumen ejecutivo de la optimización
+- Análisis de parámetros del algoritmo
+- Interpretación de resultados
+- Recomendaciones técnicas
+- Conclusiones
+
+### Cómo usarlo
+
+1. Optimiza una ruta
+2. Haz clic en **"Análisis con IA"**
+![BotonIa](/images/botonIa.png)
+3. Espera 3-5 segundos
+![CargaIa](/images/Cargadeia.png)
+4. Se abrirá un modal con el análisis formateado
+![InformacionIa](/images/InformacionIa.png)
+
+### Opciones
+
+- **Copiar**: Copia el Markdown al portapapeles
+- **Descargar**: Descarga como archivo `.md`
+- **Cerrar**: Cierra el modal
+
+### Requisito
+
+⚠️ Configura `GEMINI_API_KEY` en `backend/.env` (ver [Instalación](/instalacion))
 
 ---
 

@@ -135,6 +135,70 @@ npm start
 
 ---
 
+## Problemas con Análisis IA
+
+### Error: "API Key de Gemini no configurada"
+
+**Síntoma:**
+```
+Error: API Key de Gemini no configurada
+Configura GEMINI_API_KEY en el archivo .env
+```
+
+**Solución:**
+
+1. Crea `backend/.env` con:
+```
+GEMINI_API_KEY=tu_api_key_aqui
+```
+
+2. Obtén tu clave en [Google AI Studio](https://aistudio.google.com/) (gratis)
+
+3. Reinicia backend:
+```bash
+python api_rutas_reales.py
+```
+
+---
+
+### Análisis con IA no aparece o tarda mucho
+
+**Síntoma:**
+```
+Haciendo clic en "Análisis con IA" no pasa nada
+o tarda más de 10 segundos
+```
+
+**Causas posibles:**
+- Conexión lenta a internet
+- Límites de rate de Gemini alcanzados (60 req/min free tier)
+- API Key inválida
+
+**Soluciones:**
+
+1. Verifica conexión: `ping google.com`
+2. Regenera tu API Key en [Google AI Studio](https://aistudio.google.com/)
+3. Reinicia backend
+4. Intenta de nuevo
+
+---
+
+### Modal de Análisis se abre vacío
+
+**Síntoma:**
+```
+El modal aparece pero está vacío o con texto incompleto
+```
+
+**Solución:**
+
+1. Abre consola del navegador (F12)
+2. Busca errores rojos
+3. Verifica logs del backend en terminal
+4. Intenta generar análisis de nuevo
+
+---
+
 ## Checklist de Diagnóstico
 
 Si hay problemas, seguir este checklist:
@@ -148,6 +212,12 @@ Si hay problemas, seguir este checklist:
 
 ☐ Puerto 5000 disponible
   netstat -ano | findstr :5000
+
+☐ Archivo backend/.env existe
+  Contiene GEMINI_API_KEY válida
+
+☐ Conexión a internet activa
+  ping google.com
 
 ☐ rutas_reales.json existe
   cd backend && ls rutas_reales.json

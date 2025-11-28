@@ -1,83 +1,85 @@
 @startuml Secuencia - Análisis IA Detallado v2.0
 
 participant Usuario as U
-participant Frontend as F
-participant Backend as B
-participant GeminiAPI as G
-participant MapComponent as M
+participant App as A
+participant AIAnalysisModal as M
+participant api_rutas_reales as API
+participant genai.Client as GeminiAPI
+participant renderMarkdown as Render
 
 autonumber
 
-U -> F: Hace clic en "Generar Análisis IA"
-F -> F: Desactiva botón (cargando = true)
-F -> F: Muestra spinner de carga
+U -> A: Hace clic en "Generar Análisis IA"
+A -> A: setCargandoIA = true\nsetModalIAOpen = true
 
-F -> B: POST /api/analisis-ia\n{resultados_ga}
+A -> M: Abre modal con spinner
 
-B -> B: Valida datos recibidos
-B -> B: Construye prompt contextualizado:\n- Datos de paradas\n- Parámetros del AG\n- Historial fitness\n- Estadísticas
+A -> API: POST /api/analisis-ia\n{ruta, estadisticas}
 
-B -> G: Envía prompt a Google Gemini 2.0 Flash
-note right of B
-    Prompt incluye:
-    - Descripción del problema
-    - Datos de entrada
-    - Resultados del GA
-    - Solicitud de análisis
-end note
+API -> API: Obtiene GEMINI_API_KEY\nInicializa genai.Client
 
-G -> G: Procesa con modelo Gemini
-G -> G: Genera análisis completo:\n- Resumen ejecutivo\n- Explicación del algoritmo\n- Análisis de parámetros\n- Recomendaciones\n- Conclusiones
+API -> API: Extrae datos:\n- nombre_ruta\n- paraderos\n- distancia_total\n- parametros_ga
 
-G -> B: Retorna texto en Markdown
+API -> API: Construye prompt detallado:\n- Info ruta\n- Parámetros AG\n- Historial fitness\n- Solicitud análisis
 
-B -> B: Valida respuesta
-B -> B: Formatea JSON con análisis
-B -> B: Estructura respuesta:\n{\n  status: 'success',\n  analisis_markdown: '...',\n  timestamp: now\n}
+API -> GeminiAPI: genai_client.models.generate_content(\nprompt, stream=True)
 
-B -> F: Retorna 200 OK + análisis
+GeminiAPI -> GeminiAPI: Procesa con Gemini Flash
+GeminiAPI -> GeminiAPI: Genera análisis:\n- Resumen ejecutivo\n- Análisis de parámetros\n- Recomendaciones\n- Conclusiones
 
-F -> F: Parsea respuesta JSON
-F -> F: Extrae texto markdown
-F -> F: Actualiza estado:\n- analisisIA = datos\n- modalIA = true
-F -> F: Detiene spinner
+GeminiAPI -> API: Retorna stream de tokens Markdown
 
-F -> U: Abre Modal con Análisis
+API -> API: Acumula respuesta completa
+API -> API: Formatea JSON:\n{\n  status: 'success',\n  analisis_markdown: '...',\n  timestamp: now\n}
 
-M -> M: Renderiza Markdown
-M -> M: Convierte títulos, negrita,\nlistas, código, etc.
+API -> A: Retorna 200 OK + análisis
 
-U -> F: Lee análisis en modal
-U -> F: Hace clic en "Copiar"
+A -> A: Captura respuesta
+A -> A: setAnalisisIA = response.data
+A -> A: setCargandoIA = false
 
-F -> F: Copia markdown al\nportapapeles (clipboard API)
-F -> U: Muestra toast:\n"Copiado al portapapeles"
+M -> M: Desaparece spinner
+M -> Render: Llama renderMarkdown(analisis)
 
-U -> F: Hace clic en "Descargar"
+Render -> Render: Procesa Markdown:\n- Encabezados (##, ###)\n- Listas (-, *)\n- Código (```...```)\n- Negritas (**text**)
 
-F -> F: Crea blob de texto
-F -> F: Genera nombre archivo:\nanalisis-{fecha-hora}.md
-F -> F: Dispara descarga
-F -> U: Archivo .md descargado
+Render -> M: Retorna elementos JSX
 
-U -> F: Hace clic en X o "Cerrar"
+M -> U: Renderiza análisis formateado
 
-F -> F: Actualiza estado:\n- modalIA = false
-F -> U: Modal cerrado
+U -> M: Hace clic en "Copiar"
 
-note over U, G
-    **Flujo Completo del Análisis IA (v2.0):**
+M -> M: navigator.clipboard\n.writeText(analisis)
+M -> M: Muestra check durante 2 seg
+
+U -> M: Hace clic en "Descargar"
+
+M -> M: Crea blob:\nnew Blob([analisis],\n  {type: 'text/markdown'})
+M -> M: Genera nombre:\nanalisis-ruta-{date}.md
+M -> M: Dispara descarga
+
+U -> M: Hace clic en X (onClose)
+
+M -> A: setModalIAOpen = false
+A -> U: Modal cerrado
+
+note over U, GeminiAPI
+    **Flujo del Análisis IA (v2.0):**
     
-    1. Usuario inicia análisis
-    2. Frontend envía resultados GA
-    3. Backend construye prompt rico
-    4. Google Gemini analiza
-    5. Modal muestra análisis Markdown
+    1. App.js usuario inicia análisis
+    2. AIAnalysisModal abre con cargando
+    3. api_rutas_reales construye prompt
+    4. genai.Client genera análisis
+    5. renderMarkdown formatea resultado
     6. Usuario puede copiar/descargar
-    7. Experiencia integrada UX
+    
+    **Componentes principales:**
+    - App.js: Lógica principal
+    - AIAnalysisModal: UI del modal
+    - api_rutas_reales: Endpoint /api/analisis-ia
+    - Google genai: Gemini Flash 2.0
     
     **Tiempo típico:** 3-5 segundos
-    **Dependencia:** Conexión internet + API key Gemini
 end note
 
 @enduml

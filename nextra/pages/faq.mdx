@@ -78,6 +78,41 @@ Gen 50: Los 2 mejores - Gen 51 (sin cambios)
 
 Ventajas:
 - La solución NUNCA empeora
+
+---
+
+## Análisis con IA
+
+### ¿Qué es el análisis con IA?
+
+Genera automáticamente un informe (Markdown) analizando la optimización con Google Gemini.
+
+### ¿Cómo genero un análisis?
+
+1. Optimiza una ruta
+2. Haz clic en "Análisis con IA"
+3. Espera 3-5 segundos
+4. El modal muestra el análisis formateado
+
+### ¿Necesito una API Key?
+
+Sí. Configura `GEMINI_API_KEY` en `backend/.env` (ver [Instalación](/instalacion))
+
+### ¿Cuánto tarda?
+
+Normalmente **3-5 segundos** dependiendo de conexión y carga del servidor
+
+### ¿Puedo exportar el análisis?
+
+Sí - el modal ofrece dos opciones:
+- **Copiar**: Al portapapeles (Markdown)
+- **Descargar**: Como archivo `.md`
+
+### ¿Hay límites de uso?
+
+Sí - Google Gemini aplica rate limits:
+- Free tier: 60 solicitudes/minuto
+- Para producción: considera un plan pagado
 - Garantiza convergencia
 - Explora mientras protege lo bueno
 
