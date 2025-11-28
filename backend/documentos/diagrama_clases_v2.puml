@@ -4,387 +4,105 @@
 skinparam backgroundColor #FEFEFE
 skinparam classBackgroundColor #F0F0F0
 skinparam classBorderColor #333
+```plantuml
+@startuml Diagrama de Módulos - Backend (Python)
+
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam classBackgroundColor #F0F0F0
+skinparam classBorderColor #333
 skinparam arrowColor #333
 
-' === CLASES DEL BACKEND (Python) ===
+' === MÓDULOS / COMPONENTES DEL BACKEND ===
 
 package "Backend - Python (Flask)" {
-    
-    class FlaskAPI {
-        - app: Flask
-        - datos_rutas: dict
-        - geocoder: Geocoder
-        - network: nx.MultiDiGraph
-        - cache: CacheManager
-        --
-        + __init__()
-        + cargar_rutas()
-        + health_check() -> dict
-        + obtener_info_rutas() -> dict
-        + optimizar_rutas(ruta_ids?) -> dict
-        + analizar_con_ia(resultados_ga) -> dict [NEW]
-        + setup_cache()
+
+    class api_rutas_reales {
+        + health_check()
+        + obtener_info_rutas()
+        + optimizar_rutas_reales()
+        + analisis_ia()
+        - cache_coordenadas
+        - cache_matrices
+        - cache_geometrias
+        - GEMINI_API_KEY
+        - gemini_client
     }
-    
-    class DataLoader {
-        - archivo_rutas: str
-        - encoder: LabelEncoder
-        --
-        + cargar_datos() -> dict
-        + validar_datos() -> bool
-        + obtener_rutas() -> list
-        + obtener_paradas(ruta_id) -> list
-        + obtener_primera_parada(ruta_id) -> dict
+
+    class data_loader {
+        + obtener_coordenadas(direcciones)
+        + matriz_distancias_osm_con_geometria(coordenadas)
+        + matriz_distancias_osm(coordenadas)
     }
-    
-    class CoordenadaHandler {
-        - coordenadas_exactas: dict
-        - geocoder: Geocoder
-        - cache: CacheManager
-        --
-        + obtener_coordenadas(direccion) -> (lat, lon)
-        + geocodificar(lista_direcciones) -> list
-        + procesar_coordenadas() -> list
-        + usar_cache(direccion) -> (lat, lon)?
-        + guardar_en_cache(direccion, coords)
+
+    class rutas_loader {
+        + cargar_rutas_reales()
+        + obtener_todas_las_paradas()
+        + obtener_paradas_por_ruta(ruta_id)
+        + obtener_info_ruta(ruta_id)
+        + obtener_todas_las_rutas()
+        + crear_asignacion_buses_por_ruta()
     }
-    
-    class CalculadoraDistancias {
-        - network: nx.MultiDiGraph
-        - matriz_distancias: dict
-        - geometrias: dict
-        - cache: CacheManager
-        --
-        + descargar_red_osm(ciudad, redes) -> nx.MultiDiGraph
-        + calcular_matriz_distancias(coords) -> ndarray
-        + calcular_geometria_rutas(coords) -> list
-        + obtener_del_cache(coords_hash) -> ndarray?
-        + guardar_en_cache(coords_hash, matriz)
+
+    class genetic_algorithm {
+        + crear_individuo(n_paradas, punto_inicio_idx=0, punto_fin_idx=None)
+        + crear_poblacion(tamano_poblacion, n_paradas, punto_inicio_idx=0, punto_fin_idx=None)
+        + seleccion_torneo(poblacion, fitness_poblacion, k=3)
+        + cruce_pmx(padre1, padre2)
+        + mutacion_intercambio(individuo, tasa_mutacion=0.1)
+        + algoritmo_genetico(matriz_distancias, punto_inicio_idx=0, punto_fin_idx=None, tamano_poblacion=100, generaciones=200, tasa_cruce=0.8, tasa_mutacion=0.15, elitismo=2, verbose=True)
     }
-    
-    class GeneticAlgorithm {
-        - poblacion_size: int
-        - num_generaciones: int
-        - tasa_cruce: float
-        - tasa_mutacion: float
-        - torneo_k: int
-        - elitismo: int
-        - matriz_distancias: ndarray
-        - paradas: list
-        - historial_fitness: list
-        --
-        + __init__(params)
-        + crear_poblacion() -> list
-        + evaluar_poblacion(poblacion) -> list
-        + seleccion_torneo(poblacion, fitness) -> list
-        + cruce_pmx(padre1, padre2) -> tuple
-        + mutacion_intercambio(individuo) -> list
-        + evolucionar() -> (best, historial)
-        + aplicar_elitismo(poblacion, elite)
+
+    class fitness {
+        + calcular_fitness(ruta, matriz_distancias)
+        + evaluar_poblacion(poblacion, matriz_distancias)
+        + calcular_fitness_con_penalizacion(ruta, matriz_distancias, capacidad_bus=50, demanda_paradas=None)
     }
-    
-    class FitnessCalculator {
-        - matriz_distancias: ndarray
-        - paradas_por_ruta: dict
-        - pesos: dict
-        --
-        + calcular_fitness(ruta) -> float
-        + calcular_distancia_total(ruta) -> float
-        + calcular_tiempo_espera(ruta) -> float
-        + calcular_balanceo_paradas(ruta) -> float
-        + normalizar_fitness(valor) -> float
+
+    class coordenadas_exactas {
+        + COORDENADAS_EXACTAS
+        + buscar_coordenada_exacta(direccion)
     }
-    
-    class GeminiAIAnalyzer {
-        - api_key: str
-        - modelo: str
-        - cliente_gemini: genai.GenerativeModel
-        --
-        + __init__(api_key) [NEW]
-        + construir_prompt(datos_ruta, resultados) -> str [NEW]
-        + generar_analisis(prompt) -> str [NEW]
-        + interpretar_resultados(json_resultados) -> dict [NEW]
-        + generar_recomendaciones(analisis) -> list [NEW]
-        + formatear_markdown(analisis_raw) -> str [NEW]
-    }
-    
-    class CacheManager {
-        - almacen: dict
-        - tipos: dict
-        --
-        + guardar(clave, valor, tipo)
-        + obtener(clave) -> any?
-        + existe(clave) -> bool
-        + limpiar_tipo(tipo)
-        + limpiar_todo()
-        + obtener_stats() -> dict
-    }
+
 }
 
-' === CLASES DEL FRONTEND (React) ===
+' === RELACIONES (uso / dependencia) ===
 
-package "Frontend - React (JavaScript)" {
-    
-    class App {
-        - rutas: Ruta[]
-        - rutasSeleccionadas: number[]
-        - resultados: ResultadosOptimizacion?
-        - cargando: boolean
-        - modalIA: boolean [NEW]
-        - analisisIA: AnalisisIA? [NEW]
-        --
-        + optimizarRuta(): void
-        + generarAnalisisIA(): void [NEW]
-        + cerrarModalIA(): void [NEW]
-        + seleccionarRutaOptimizada(): void
-        + get rutasDisponibles(): Ruta[]
-    }
-    
-    class RouteSelector {
-        - rutas: Ruta[]
-        - seleccionadas: number[]
-        - onChange: function
-        --
-        + render(): JSX.Element
-        + handleSelectRuta(id): void
-        + handleSelectAll(): void
-        + handleDeselectAll(): void
-    }
-    
-    class MapView {
-        - coordenadas: Coordenada[]
-        - geometria: GeoJSON?
-        - zoom: number
-        - centro: Coordenada
-        --
-        + render(): JSX.Element
-        + mostrarRuta(coords): void
-        + mostrarGeometria(geojson): void
-        + ajustarZoom(): void
-    }
-    
-    class GeneticAlgorithmPanel {
-        - poblacion: number
-        - generaciones: number
-        - tasaCruce: number
-        - tasaMutacion: number
-        - cargando: boolean
-        - onOptimizar: function
-        --
-        + render(): JSX.Element
-        + handleCambioParametro(param, valor): void
-        + handleOptimizar(): void
-        + mostrarResultados(resultados): void
-    }
-    
-    class AlgorithmProcedurePanel {
-        - pasos: PasoAlgoritmo[]
-        - actual: number
-        - historialFitness: number[]
-        --
-        + render(): JSX.Element
-        + mostrarPaso(numero): void
-        + avanzarPaso(): void
-        + retrocederPaso(): void
-        + graficarFitness(): void
-    }
-    
-    class AIAnalysisModal {
-        - analisis: string [NEW]
-        - markdown: JSX.Element [NEW]
-        - cargando: boolean [NEW]
-        - onClose: function [NEW]
-        --
-        + render(): JSX.Element [NEW]
-        + renderMarkdown(texto): JSX.Element [NEW]
-        + copiarAlPortapapeles(): void [NEW]
-        + descargarComoMarkdown(): void [NEW]
-        + handleCerrar(): void [NEW]
-    }
-    
-    class ApiClient {
-        - baseURL: string
-        - timeout: number
-        --
-        + getHealth(): Promise
-        + getRutasInfo(): Promise
-        + optimizarRutas(ids?): Promise
-        + generarAnalisisIA(datos): Promise [NEW]
-        + handleError(error): void
-    }
-}
+api_rutas_reales --> rutas_loader : cargar rutas
+api_rutas_reales --> data_loader : geocodificar / calcular matriz y geometrías
+api_rutas_reales --> genetic_algorithm : ejecutar algoritmo_genetico
+genetic_algorithm --> fitness : evaluar_poblacion / calcular_fitness
+data_loader --> coordenadas_exactas : buscar_coordenada_exacta
+api_rutas_reales ..> genai : usa cliente Gemini (si está configurado)
 
-' === ESTRUCTURAS DE DATOS ===
+' === NOTAS RELEVANTES ===
 
-package "Estructuras de Datos" {
-    
-    class Ruta {
-        - id: number
-        - nombre: string
-        - descripcion: string
-        - paradas: Parada[]
-        - distancia_km: number
-        - tiempo_promedio_min: number
-    }
-    
-    class Parada {
-        - id: number
-        - nombre: string
-        - direccion: string
-        - latitud: number
-        - longitud: number
-        - orden: number
-        - horario_salida: string
-        - horario_llegada: string
-    }
-    
-    class Individuo {
-        - cromosoma: number[]
-        - fitness: number
-        - distancia: number
-        - horarios: string[]
-    }
-    
-    class ResultadosOptimizacion {
-        - ruta_original: Ruta
-        - ruta_optimizada: Ruta
-        - mejora_distancia: number
-        - mejora_porcentaje: number
-        - matriz_distancias: ndarray
-        - geometria: GeoJSON
-        - historial_fitness: number[]
-        - tiempo_ejecucion: number
-    }
-    
-    class AnalisisIA {
-        - resumen_ejecutivo: string [NEW]
-        - explicacion_algoritmo: string [NEW]
-        - analisis_parametros: string [NEW]
-        - recomendaciones: string[] [NEW]
-        - conclusiones: string [NEW]
-        - markdown_completo: string [NEW]
-    }
-    
-    class Coordenada {
-        - latitud: number
-        - longitud: number
-        - direccion: string
-        - accuracy: number
-    }
-}
-
-' === RELACIONES DE COMPOSICIÓN ===
-
-FlaskAPI *-- DataLoader : usa
-FlaskAPI *-- CoordenadaHandler : usa
-FlaskAPI *-- CalculadoraDistancias : usa
-FlaskAPI *-- GeneticAlgorithm : usa
-FlaskAPI *-- GeminiAIAnalyzer : usa [NEW]
-FlaskAPI *-- CacheManager : usa
-
-DataLoader *-- Ruta : carga
-DataLoader *-- Parada : carga
-
-GeneticAlgorithm *-- Individuo : crea
-GeneticAlgorithm *-- FitnessCalculator : usa
-GeneticAlgorithm *-- CacheManager : usa
-
-CalculadoraDistancias *-- CacheManager : usa
-CoordenadaHandler *-- CacheManager : usa
-
-App *-- RouteSelector : contiene
-App *-- MapView : contiene
-App *-- GeneticAlgorithmPanel : contiene
-App *-- AlgorithmProcedurePanel : contiene
-App *-- AIAnalysisModal : contiene [NEW]
-App *-- ApiClient : usa
-
-RouteSelector *-- Ruta : maneja
-MapView *-- Coordenada : visualiza
-GeneticAlgorithmPanel *-- Individuo : muestra
-
-ResultadosOptimizacion *-- Ruta : contiene
-ResultadosOptimizacion *-- Coordenada : contiene
-AIAnalysisModal *-- AnalisisIA : muestra [NEW]
-
-' === RELACIONES DE DEPENDENCIA ===
-
-FitnessCalculator --> Parada : evalúa
-GeneticAlgorithm --> FitnessCalculator : usa
-
-FlaskAPI --> Ruta : retorna
-FlaskAPI --> ResultadosOptimizacion : retorna
-FlaskAPI --> AnalisisIA : retorna [NEW]
-
-ApiClient --> FlaskAPI : comunica
-App --> ApiClient : usa
-
-GeminiAIAnalyzer --> ResultadosOptimizacion : analiza [NEW]
-GeminiAIAnalyzer --> AnalisisIA : produce [NEW]
-
-' === NOTAS ===
-
-note right of GeminiAIAnalyzer #FF9966
-    **NUEVA CLASE (v2.0)**
-    Integración con Google Gemini API
-    para análisis automático de
-    resultados del algoritmo genético
-    
-    Modelos: gemini-2.0-flash
+note right of api_rutas_reales #FFEECC
+  Endpoints principales (archivo: `api_rutas_reales.py`):
+  - `GET /api/health` -> `health_check()`
+  - `GET /api/rutas/info` -> `obtener_info_rutas()`
+  - `GET /api/rutas/optimizar` -> `optimizar_rutas_reales()` (parámetros GA en querystring)
+  - `POST /api/analisis-ia` -> `analisis_ia()` (envía datos a Gemini)
+  Variables globales de caché: `cache_coordenadas`, `cache_matrices`, `cache_geometrias`.
 end note
 
-note right of AIAnalysisModal #FF9966
-    **NUEVO COMPONENTE (v2.0)**
-    Modal para visualizar análisis
-    generado por IA con:
-    - Renderizado de Markdown
-    - Copiar al portapapeles
-    - Descargar como archivo .md
+note left of data_loader #DDFFDD
+  `data_loader.py` usa OSMnx y Geopy para:
+  - geocodificar direcciones (`obtener_coordenadas`)
+  - construir matriz de distancias y geometrías reales (`matriz_distancias_osm_con_geometria`)
 end note
 
-note right of App
-    **NEW en v2.0:**
-    - State: modalIA, analisisIA
-    - Handler: generarAnalisisIA()
-    - Función: cerrarModalIA()
+note left of genetic_algorithm #DDDDFF
+  `genetic_algorithm.py` implementa:
+  - Selección por torneo, Cruce PMX, Mutación por intercambio
+  - Retorna `{'mejor_ruta', 'mejor_fitness', 'historial_fitness', 'historial_detallado'}`
 end note
 
-note bottom of GeneticAlgorithm
-    **Parámetros configurables:**
-    - población: 100
-    - generaciones: 200
-    - cruce PMX: 0.8
-    - mutación: 0.15
-    - torneo_k: 3
-    - elitismo: 2
-end note
-
-note bottom of FitnessCalculator
-    **Función multiobjeto:**
-    - Distancia total (principal)
-    - Tiempo de espera
-    - Balanceo de paradas
-end note
-
-note left of CalculadoraDistancias
-    **Triple caché:**
-    - Coordenadas geocodificadas
-    - Matrices de distancias
-    - Geometrías de rutas
-end note
-
-note bottom of CacheManager
-    **Tipos de caché:**
-    - coordinates
-    - distance_matrices
-    - geometries
-end note
-
-note bottom of ApiClient
-    **NEW Endpoint (v2.0):**
-    POST /api/analisis-ia
-    Genera análisis IA automático
-    usando Google Gemini
+note bottom of coordenadas_exactas #FFEEDD
+  Diccionario `COORDENADAS_EXACTAS` con paradas predefinidas
+  `buscar_coordenada_exacta()` intenta coincidencias exactas y parciales
 end note
 
 @enduml
+```
+        + formatear_markdown(analisis_raw) -> str [NEW]
