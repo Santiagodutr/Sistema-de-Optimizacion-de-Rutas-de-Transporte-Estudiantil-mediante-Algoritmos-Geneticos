@@ -7,6 +7,7 @@ import GeneticAlgorithmPanel from './components/GeneticAlgorithmPanel';
 import AlgorithmProcedurePanel from './components/AlgorithmProcedurePanel';
 import MapView from './components/MapView';
 import AIAnalysisModal from './components/AIAnalysisModal';
+import ThemeToggle from './components/ThemeToggle';
 import axios from 'axios';
 
 function App() {
@@ -15,7 +16,7 @@ function App() {
   const [rutasOptimizadas, setRutasOptimizadas] = useState([]);
   const [estadisticas, setEstadisticas] = useState(null);
   const [cargando, setCargando] = useState(false);
-  
+
   // Estados para el análisis con IA
   const [modalIAOpen, setModalIAOpen] = useState(false);
   const [analisisIA, setAnalisisIA] = useState(null);
@@ -51,7 +52,7 @@ function App() {
       // Construir URL con parámetros
       const params = new URLSearchParams();
       params.append('rutas_ids', rutaId);
-      
+
       // Agregar parámetros del algoritmo genético si se proporcionan
       if (parametros.paradaInicial !== undefined) {
         params.append('punto_inicio_idx', parametros.paradaInicial);
@@ -121,9 +122,9 @@ function App() {
 
   return (
     <Router>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
         <Toaster position="top-right" richColors />
-        
+
         {/* Modal de Análisis IA */}
         <AIAnalysisModal
           isOpen={modalIAOpen}
@@ -131,36 +132,36 @@ function App() {
           analisis={analisisIA}
           cargando={cargandoIA}
         />
-        
-        <header className="bg-white border-b border-slate-200 shadow-sm">
+
+        <header className="sticky top-0 z-50 glass-effect border-b">
           <div className="max-w-[1600px] mx-auto px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-2.5 rounded-xl shadow-lg">
-                  <Bus className="w-7 h-7 text-white" />
+                <div className="bg-primary p-2.5 rounded-xl text-primary-foreground shadow-lg shadow-primary/30">
+                  <Bus className="w-7 h-7" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+                  <h1 className="text-2xl font-bold tracking-tight">
                     Optimizador de Rutas
                   </h1>
-                  <p className="text-sm text-slate-600 flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5" />
+                  <p className="text-sm text-muted-foreground flex items-center gap-1.5 font-medium">
+                    <Sparkles className="w-3.5 h-3.5 text-accent" />
                     Universidad de los Llanos
                   </p>
                 </div>
               </div>
-              
-              <div className="flex items-center gap-3">
-                
-                
-                <a 
-                  href="https://github.com" 
-                  target="_blank" 
+
+              <div className="flex items-center gap-4">
+                <ThemeToggle />
+
+                <a
+                  href="https://github.com"
+                  target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-4 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all"
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-all border border-transparent hover:border-border"
                 >
                   <Github className="w-4 h-4" />
-                  <span className="hidden sm:inline">GitHub</span>
+                  <span className="hidden sm:inline font-medium">GitHub</span>
                 </a>
               </div>
             </div>
@@ -169,7 +170,7 @@ function App() {
 
         <main className="max-w-[1600px] mx-auto px-6 py-6">
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-            
+
             {/* Columna Izquierda: Selector */}
             <div className="xl:col-span-4">
               <RouteSelector
@@ -187,7 +188,7 @@ function App() {
                 rutasOptimizadas={rutasOptimizadas}
                 cargando={cargando}
               />
-              
+
               {rutasOptimizadas.length > 0 && (
                 <AlgorithmProcedurePanel
                   ruta={rutasOptimizadas[0]}
@@ -208,15 +209,15 @@ function App() {
           )}
         </main>
 
-        <footer className="mt-12 border-t border-slate-200 bg-white">
-          <div className="max-w-[1600px] mx-auto px-6 py-6">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-600">
-              <div className="flex items-center gap-2">
-                <Activity className="w-4 h-4" />
+        <footer className="mt-12 border-t border-border bg-card/50 backdrop-blur-sm">
+          <div className="max-w-[1600px] mx-auto px-6 py-8">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground font-medium">
+              <div className="flex items-center gap-2 hover:text-foreground transition-colors cursor-default">
+                <Activity className="w-4 h-4 text-primary" />
                 <span>Optimización con Algoritmos Genéticos</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Map className="w-4 h-4" />
+              <div className="flex items-center gap-2 hover:text-foreground transition-colors cursor-default">
+                <Map className="w-4 h-4 text-accent" />
                 <span>Datos de OpenStreetMap</span>
               </div>
             </div>

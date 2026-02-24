@@ -4,18 +4,18 @@ import { Button } from './ui/button';
 import { Select } from './ui/select';
 import { MapPin, Play, Loader2, Settings, ChevronDown, ChevronUp, Flag, Target } from 'lucide-react';
 
-const RouteSelector = ({ 
-  rutasDisponibles, 
-  rutaSeleccionada, 
-  setRutaSeleccionada, 
+const RouteSelector = ({
+  rutasDisponibles,
+  rutaSeleccionada,
+  setRutaSeleccionada,
   optimizarRuta,
-  cargando 
+  cargando
 }) => {
   const [paraderos, setParaderos] = useState([]);
   const [paradaInicial, setParadaInicial] = useState(0);
   const [paradaFinal, setParadaFinal] = useState(0);
   const [mostrarParametros, setMostrarParametros] = useState(false);
-  
+
   // Parámetros del algoritmo genético
   const [parametrosGA, setParametrosGA] = useState({
     tamano_poblacion: 100,
@@ -58,7 +58,7 @@ const RouteSelector = ({
       }));
       return;
     }
-    
+
     const parsedValue = isFloat ? parseFloat(value) : parseInt(value);
     if (!isNaN(parsedValue)) {
       setParametrosGA(prev => ({
@@ -75,22 +75,23 @@ const RouteSelector = ({
   };
 
   return (
-    <Card className="shadow-lg border-slate-200">
-      <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-slate-200">
-        <div className="flex items-center gap-2">
-          <div className="bg-blue-500 p-2 rounded-lg">
-            <MapPin className="w-5 h-5 text-white" />
+    <Card className="glass-effect overflow-hidden border-border/50">
+      <CardHeader className="bg-primary/5 dark:bg-primary/10 border-b border-border/50 pb-6 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-10 -mt-10" />
+        <div className="flex items-center gap-3 relative z-10">
+          <div className="bg-primary p-2.5 rounded-xl text-primary-foreground shadow-lg shadow-primary/30">
+            <MapPin className="w-5 h-5" />
           </div>
           <div>
-            <CardTitle className="text-lg">Seleccionar Ruta</CardTitle>
-            <CardDescription>Elige una ruta para optimizar</CardDescription>
+            <CardTitle className="text-xl font-bold tracking-tight text-foreground">Seleccionar Ruta</CardTitle>
+            <CardDescription className="text-muted-foreground font-medium">Elige una ruta para optimizar</CardDescription>
           </div>
         </div>
       </CardHeader>
-      
-      <CardContent className="space-y-4 pt-6">
-        <div>
-          <label className="text-sm font-medium text-slate-700 mb-2 block">
+
+      <CardContent className="space-y-6 pt-6">
+        <div className="space-y-2">
+          <label className="text-sm font-semibold text-foreground tracking-wide">
             Ruta de Transporte
           </label>
           <Select
@@ -108,18 +109,19 @@ const RouteSelector = ({
         </div>
 
         {rutaSeleccionada && paraderos.length > 0 && (
-          <>
+          <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Selección de parada inicial y final */}
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4 space-y-3">
-              <h4 className="font-semibold text-green-900 text-sm flex items-center gap-2">
-                <Flag className="w-4 h-4" />
+            <div className="bg-secondary/40 border border-border/50 rounded-xl p-5 space-y-4 relative overflow-hidden group hover:border-primary/30 transition-colors">
+              <div className="absolute -left-1 top-0 bottom-0 w-1 bg-gradient-to-b from-primary to-accent opacity-75"></div>
+              <h4 className="font-semibold text-foreground flex items-center gap-2 text-sm tracking-wide">
+                <Flag className="w-4 h-4 text-primary" />
                 Configurar Recorrido
               </h4>
-              
-              <div className="space-y-3">
-                <div>
-                  <label className="text-xs font-medium text-green-800 mb-1 block flex items-center gap-1">
-                    <Target className="w-3 h-3" />
+
+              <div className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5 uppercase tracking-wider">
+                    <Target className="w-3.5 h-3.5 text-accent" />
                     Parada Inicial
                   </label>
                   <Select
@@ -135,10 +137,10 @@ const RouteSelector = ({
                     ))}
                   </Select>
                 </div>
-                
-                <div>
-                  <label className="text-xs font-medium text-green-800 mb-1 block flex items-center gap-1">
-                    <Flag className="w-3 h-3" />
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5 uppercase tracking-wider">
+                    <Flag className="w-3.5 h-3.5 text-destructive" />
                     Parada Final
                   </label>
                   <Select
@@ -158,28 +160,30 @@ const RouteSelector = ({
             </div>
 
             {/* Panel colapsable de parámetros del algoritmo genético */}
-            <div className="border border-slate-200 rounded-lg overflow-hidden">
+            <div className="border border-border/50 rounded-xl overflow-hidden bg-card transition-all">
               <button
                 type="button"
                 onClick={() => setMostrarParametros(!mostrarParametros)}
-                className="w-full px-4 py-3 bg-gradient-to-r from-purple-50 to-indigo-50 flex items-center justify-between text-left hover:from-purple-100 hover:to-indigo-100 transition-colors"
+                className="w-full px-5 py-4 bg-secondary/20 flex flex-row items-center justify-between hover:bg-secondary/40 transition-colors"
               >
-                <div className="flex items-center gap-2">
-                  <Settings className="w-4 h-4 text-purple-600" />
-                  <span className="text-sm font-medium text-purple-900">Parámetros del Algoritmo Genético</span>
+                <div className="flex items-center gap-3">
+                  <div className="bg-primary/10 p-1.5 rounded-lg text-primary">
+                    <Settings className="w-4 h-4" />
+                  </div>
+                  <span className="text-sm font-semibold text-foreground tracking-wide">Ajustes Avanzados</span>
                 </div>
                 {mostrarParametros ? (
-                  <ChevronUp className="w-4 h-4 text-purple-600" />
+                  <ChevronUp className="w-4 h-4 text-muted-foreground" />
                 ) : (
-                  <ChevronDown className="w-4 h-4 text-purple-600" />
+                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
                 )}
               </button>
-              
+
               {mostrarParametros && (
-                <div className="p-4 space-y-4 bg-white">
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="text-xs font-medium text-slate-700 mb-1 block">
+                <div className="p-5 space-y-5 animate-in slide-in-from-top-2 duration-300">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                         Población
                       </label>
                       <input
@@ -194,13 +198,13 @@ const RouteSelector = ({
                           }
                         }}
                         disabled={cargando}
-                        className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
                       />
-                      <p className="text-xs text-slate-500 mt-1">individuos</p>
+                      <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">individuos</p>
                     </div>
-                    
-                    <div>
-                      <label className="text-xs font-medium text-slate-700 mb-1 block">
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                         Generaciones
                       </label>
                       <input
@@ -215,15 +219,15 @@ const RouteSelector = ({
                           }
                         }}
                         disabled={cargando}
-                        className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
                       />
-                      <p className="text-xs text-slate-500 mt-1">iteraciones</p>
+                      <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">iteraciones</p>
                     </div>
                   </div>
-                  
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="text-xs font-medium text-slate-700 mb-1 block">
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                         Tasa de Cruce
                       </label>
                       <input
@@ -239,14 +243,14 @@ const RouteSelector = ({
                           }
                         }}
                         disabled={cargando}
-                        className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
                       />
-                      <p className="text-xs text-slate-500 mt-1">{parametrosGA.tasa_cruce !== '' ? Math.round(parametrosGA.tasa_cruce * 100) : 0}%</p>
+                      <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">{parametrosGA.tasa_cruce !== '' ? Math.round(parametrosGA.tasa_cruce * 100) : 0}% probabil.</p>
                     </div>
-                    
-                    <div>
-                      <label className="text-xs font-medium text-slate-700 mb-1 block">
-                        Tasa de Mutación
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                        Mutación
                       </label>
                       <input
                         type="number"
@@ -261,14 +265,14 @@ const RouteSelector = ({
                           }
                         }}
                         disabled={cargando}
-                        className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
                       />
-                      <p className="text-xs text-slate-500 mt-1">{parametrosGA.tasa_mutacion !== '' ? Math.round(parametrosGA.tasa_mutacion * 100) : 0}%</p>
+                      <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">{parametrosGA.tasa_mutacion !== '' ? Math.round(parametrosGA.tasa_mutacion * 100) : 0}% probabil.</p>
                     </div>
                   </div>
-                  
-                  <div>
-                    <label className="text-xs font-medium text-slate-700 mb-1 block">
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                       Elitismo
                     </label>
                     <input
@@ -283,29 +287,30 @@ const RouteSelector = ({
                         }
                       }}
                       disabled={cargando}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
                     />
-                    <p className="text-xs text-slate-500 mt-1">mejores individuos preservados</p>
+                    <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">mejores individuos preservados</p>
                   </div>
                 </div>
               )}
             </div>
-          </>
+          </div>
         )}
 
         {rutaSeleccionada && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-2">
-            <h4 className="font-semibold text-blue-900 text-sm">Información de la Ruta</h4>
+          <div className="bg-secondary/40 border border-primary/20 rounded-xl p-5 space-y-3 relative overflow-hidden group hover:border-primary/40 transition-colors animate-in fade-in slide-in-from-bottom-6 duration-700">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full blur-2xl -mr-8 -mt-8" />
+            <h4 className="font-semibold text-foreground text-sm tracking-wide">Resumen</h4>
             {(() => {
               const ruta = rutasDisponibles.find(r => r.id === parseInt(rutaSeleccionada));
               return ruta ? (
-                <div className="text-sm text-blue-800 space-y-1">
-                  <p><span className="font-medium">Paradas:</span> {ruta.numero_paraderos}</p>
+                <div className="text-sm text-muted-foreground space-y-2 relative z-10">
+                  <p className="flex justify-between items-center"><span className="font-medium text-foreground">Paradas Totales</span> <span className="bg-secondary px-2 py-0.5 rounded-full text-xs">{ruta.numero_paraderos}</span></p>
                   {paraderos.length > 0 && (
-                    <>
-                      <p><span className="font-medium">Inicio:</span> {paraderos[paradaInicial]?.substring(0, 50)}{paraderos[paradaInicial]?.length > 50 ? '...' : ''}</p>
-                      <p><span className="font-medium">Final:</span> {paraderos[paradaFinal]?.substring(0, 50)}{paraderos[paradaFinal]?.length > 50 ? '...' : ''}</p>
-                    </>
+                    <div className="pt-2 border-t border-border/50 space-y-2 mt-2">
+                      <p className="text-xs flex flex-col gap-1"><span className="font-semibold text-foreground uppercase tracking-wider text-[10px]">Origen</span> <span className="truncate">{paraderos[paradaInicial]}</span></p>
+                      <p className="text-xs flex flex-col gap-1"><span className="font-semibold text-foreground uppercase tracking-wider text-[10px]">Destino</span> <span className="truncate">{paraderos[paradaFinal]}</span></p>
+                    </div>
                   )}
                 </div>
               ) : null;
@@ -316,7 +321,7 @@ const RouteSelector = ({
         <Button
           onClick={handleOptimizar}
           disabled={!rutaSeleccionada || cargando}
-          className="w-full h-12 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold shadow-md transition-all"
+          className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-[0_4px_14px_0_rgba(235,86,101,0.39)] hover:shadow-[0_6px_20px_rgba(235,86,101,0.23)] hover:-translate-y-0.5 transition-all outline-none rounded-xl"
         >
           {cargando ? (
             <>
@@ -331,8 +336,8 @@ const RouteSelector = ({
           )}
         </Button>
 
-        <p className="text-xs text-slate-500 text-center">
-          El proceso de optimización puede tardar 30-60 segundos
+        <p className="text-xs text-muted-foreground text-center font-medium mt-4">
+          El proceso utiliza <span className="text-primary font-semibold">Algoritmos Genéticos</span> avanzados
         </p>
       </CardContent>
     </Card>

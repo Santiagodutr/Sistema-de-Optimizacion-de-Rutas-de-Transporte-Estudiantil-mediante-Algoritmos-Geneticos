@@ -59,7 +59,7 @@ const AIAnalysisModal = ({ isOpen, onClose, analisis, cargando }) => {
       if (line.startsWith('```')) {
         if (inCodeBlock) {
           elements.push(
-            <pre key={`code-${index}`} className="bg-slate-900 text-green-400 p-4 rounded-lg overflow-x-auto mb-4 text-sm">
+            <pre key={`code-${index}`} className="bg-secondary text-primary p-4 rounded-xl border border-border/50 overflow-x-auto mb-4 text-sm font-mono shadow-inner">
               <code>{codeContent.join('\n')}</code>
             </pre>
           );
@@ -78,7 +78,7 @@ const AIAnalysisModal = ({ isOpen, onClose, analisis, cargando }) => {
       if (line.startsWith('## ')) {
         flushList();
         elements.push(
-          <h2 key={index} className="text-xl font-bold text-slate-900 mt-6 mb-3 flex items-center gap-2 border-b border-slate-200 pb-2">
+          <h2 key={index} className="text-xl font-black text-foreground mt-6 mb-3 flex items-center gap-2 border-b border-border/50 pb-2">
             {line.replace('## ', '')}
           </h2>
         );
@@ -88,7 +88,7 @@ const AIAnalysisModal = ({ isOpen, onClose, analisis, cargando }) => {
       if (line.startsWith('### ')) {
         flushList();
         elements.push(
-          <h3 key={index} className="text-lg font-semibold text-slate-800 mt-4 mb-2">
+          <h3 key={index} className="text-lg font-bold text-foreground mt-4 mb-2">
             {line.replace('### ', '')}
           </h3>
         );
@@ -98,7 +98,7 @@ const AIAnalysisModal = ({ isOpen, onClose, analisis, cargando }) => {
       if (line.startsWith('# ')) {
         flushList();
         elements.push(
-          <h1 key={index} className="text-2xl font-bold text-slate-900 mt-4 mb-4">
+          <h1 key={index} className="text-2xl font-black text-foreground mt-4 mb-4 tracking-tight">
             {line.replace('# ', '')}
           </h1>
         );
@@ -112,7 +112,7 @@ const AIAnalysisModal = ({ isOpen, onClose, analisis, cargando }) => {
         // Procesar negritas en el contenido
         const processedContent = content.split(/(\*\*[^*]+\*\*)/g).map((part, i) => {
           if (part.startsWith('**') && part.endsWith('**')) {
-            return <strong key={i} className="font-semibold text-slate-900">{part.slice(2, -2)}</strong>;
+            return <strong key={i} className="font-bold text-foreground">{part.slice(2, -2)}</strong>;
           }
           return part;
         });
@@ -126,14 +126,14 @@ const AIAnalysisModal = ({ isOpen, onClose, analisis, cargando }) => {
         const content = line.replace(/^\d+\. /, '');
         const processedContent = content.split(/(\*\*[^*]+\*\*)/g).map((part, i) => {
           if (part.startsWith('**') && part.endsWith('**')) {
-            return <strong key={i} className="font-semibold text-slate-900">{part.slice(2, -2)}</strong>;
+            return <strong key={i} className="font-bold text-foreground">{part.slice(2, -2)}</strong>;
           }
           return part;
         });
         elements.push(
           <div key={index} className="flex gap-2 mb-2 ml-4">
-            <span className="text-purple-600 font-semibold">{line.match(/^\d+/)[0]}.</span>
-            <span className="text-slate-700">{processedContent}</span>
+            <span className="text-primary font-black shadow-sm">{line.match(/^\d+/)[0]}.</span>
+            <span className="text-muted-foreground">{processedContent}</span>
           </div>
         );
         return;
@@ -142,7 +142,7 @@ const AIAnalysisModal = ({ isOpen, onClose, analisis, cargando }) => {
       // Separador horizontal
       if (line === '---') {
         flushList();
-        elements.push(<hr key={index} className="my-6 border-slate-200" />);
+        elements.push(<hr key={index} className="my-6 border-border/50" />);
         return;
       }
 
@@ -156,19 +156,19 @@ const AIAnalysisModal = ({ isOpen, onClose, analisis, cargando }) => {
       flushList();
       const processedLine = line.split(/(\*\*[^*]+\*\*)/g).map((part, i) => {
         if (part.startsWith('**') && part.endsWith('**')) {
-          return <strong key={i} className="font-semibold text-slate-900">{part.slice(2, -2)}</strong>;
+          return <strong key={i} className="font-bold text-foreground">{part.slice(2, -2)}</strong>;
         }
         // Procesar código inline
         return part.split(/(`[^`]+`)/g).map((subPart, j) => {
           if (subPart.startsWith('`') && subPart.endsWith('`')) {
-            return <code key={j} className="bg-slate-100 px-1.5 py-0.5 rounded text-purple-700 text-sm">{subPart.slice(1, -1)}</code>;
+            return <code key={j} className="bg-secondary px-1.5 py-0.5 rounded-md text-primary font-bold text-sm border border-border/50">{subPart.slice(1, -1)}</code>;
           }
           return subPart;
         });
       });
 
       elements.push(
-        <p key={index} className="text-slate-700 mb-3 leading-relaxed">
+        <p key={index} className="text-muted-foreground mb-3 leading-relaxed">
           {processedLine}
         </p>
       );
@@ -181,40 +181,41 @@ const AIAnalysisModal = ({ isOpen, onClose, analisis, cargando }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Overlay */}
-      <div 
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+      <div
+        className="absolute inset-0 bg-background/80 backdrop-blur-md"
         onClick={onClose}
       />
-      
+
       {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] m-4 flex flex-col overflow-hidden">
+      <div className="relative bg-card rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] m-4 flex flex-col overflow-hidden border border-border/50 ring-1 ring-white/10">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-purple-50 to-pink-50">
-          <div className="flex items-center gap-3">
-            <div className="bg-gradient-to-br from-purple-500 to-pink-500 p-2.5 rounded-xl shadow-lg">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-border/50 bg-secondary/40 relative">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none" />
+          <div className="flex items-center gap-4 relative z-10">
+            <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-2.5 rounded-xl shadow-[0_4px_14px_0_rgba(168,85,247,0.39)]">
               <Brain className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <h2 className="text-2xl font-black text-foreground flex items-center gap-2">
                 Análisis con IA
-                <Sparkles className="w-5 h-5 text-purple-500" />
+                <Sparkles className="w-5 h-5 text-primary animate-pulse" />
               </h2>
-              <p className="text-sm text-slate-600">Powered by Google Gemini</p>
+              <p className="text-sm font-medium text-muted-foreground mt-0.5">Powered by Google Gemini</p>
             </div>
           </div>
-          
-          <div className="flex items-center gap-2">
+
+          <div className="flex items-center gap-2 relative z-10">
             {analisis && (
               <>
                 <button
                   onClick={copiarAnalisis}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-bold text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-all"
                   title="Copiar análisis"
                 >
                   {copiado ? (
                     <>
                       <Check className="w-4 h-4 text-green-500" />
-                      <span className="text-green-600">Copiado</span>
+                      <span className="text-green-500">Copiado</span>
                     </>
                   ) : (
                     <>
@@ -225,7 +226,7 @@ const AIAnalysisModal = ({ isOpen, onClose, analisis, cargando }) => {
                 </button>
                 <button
                   onClick={descargarAnalisis}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-bold text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-all"
                   title="Descargar como Markdown"
                 >
                   <Download className="w-4 h-4" />
@@ -235,55 +236,57 @@ const AIAnalysisModal = ({ isOpen, onClose, analisis, cargando }) => {
             )}
             <button
               onClick={onClose}
-              className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+              className="p-2 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-colors ml-2"
             >
-              <X className="w-5 h-5 text-slate-500" />
+              <X className="w-5 h-5" />
             </button>
           </div>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto p-6 styled-scrollbar">
           {cargando ? (
             <div className="flex flex-col items-center justify-center h-64 space-y-4">
               <div className="relative">
-                <div className="absolute inset-0 bg-purple-500/20 rounded-full blur-xl animate-pulse" />
-                <Loader2 className="w-12 h-12 text-purple-600 animate-spin relative" />
+                <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl animate-pulse" />
+                <Loader2 className="w-12 h-12 text-primary animate-spin relative" />
               </div>
               <div className="text-center">
-                <p className="text-lg font-semibold text-slate-900">Analizando resultados...</p>
-                <p className="text-sm text-slate-600 mt-1">
+                <p className="text-xl font-bold text-foreground">Analizando resultados...</p>
+                <p className="text-sm font-medium text-muted-foreground mt-2">
                   Gemini AI está procesando los datos de optimización
                 </p>
               </div>
-              <div className="flex gap-1">
-                <span className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                <span className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                <span className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+              <div className="flex gap-2">
+                <span className="w-2.5 h-2.5 bg-primary rounded-full animate-bounce shadow-[0_0_10px_rgba(235,86,101,0.5)]" style={{ animationDelay: '0ms' }} />
+                <span className="w-2.5 h-2.5 bg-primary rounded-full animate-bounce shadow-[0_0_10px_rgba(235,86,101,0.5)]" style={{ animationDelay: '150ms' }} />
+                <span className="w-2.5 h-2.5 bg-primary rounded-full animate-bounce shadow-[0_0_10px_rgba(235,86,101,0.5)]" style={{ animationDelay: '300ms' }} />
               </div>
             </div>
           ) : analisis ? (
-            <div className="prose prose-slate max-w-none">
+            <div className="prose prose-slate max-w-none dark:prose-invert">
               {renderMarkdown(analisis)}
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center h-64 text-center">
-              <Brain className="w-16 h-16 text-slate-300 mb-4" />
-              <p className="text-slate-500">No hay análisis disponible</p>
+              <div className="bg-secondary/50 p-6 rounded-3xl border border-border/50 mb-4 inline-block">
+                <Brain className="w-16 h-16 text-muted-foreground opacity-50 block mx-auto" />
+              </div>
+              <p className="text-muted-foreground font-medium text-lg">No hay análisis disponible</p>
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-slate-200 bg-slate-50">
-          <div className="flex items-center justify-between text-xs text-slate-500">
+        <div className="px-6 py-4 border-t border-border/50 bg-secondary/30 backdrop-blur-sm relative z-10">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-medium text-muted-foreground">
             <div className="flex items-center gap-2">
-              <Sparkles className="w-3.5 h-3.5" />
+              <Sparkles className="w-4 h-4 text-primary" />
               <span>Análisis generado con Google Gemini AI</span>
             </div>
             <button
               onClick={onClose}
-              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors"
+              className="px-6 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl font-bold transition-all shadow-[0_4px_14px_0_rgba(235,86,101,0.39)] hover:shadow-[0_6px_20px_rgba(235,86,101,0.23)] hover:-translate-y-0.5 w-full sm:w-auto"
             >
               Cerrar
             </button>

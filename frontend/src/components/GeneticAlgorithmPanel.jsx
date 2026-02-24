@@ -7,38 +7,39 @@ const GeneticAlgorithmPanel = ({ rutasOptimizadas, estadisticas, onAnalisisIA })
   const ruta = rutasOptimizadas[0];
 
   return (
-    <Card className="shadow-lg border-slate-200">
-      <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 border-b border-slate-200 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="bg-purple-500 p-2 rounded-lg">
+    <Card className="glass-effect overflow-hidden border-border/50 relative">
+      <div className="absolute top-0 right-0 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
+      <CardHeader className="bg-secondary/40 border-b border-border/50 py-5 relative z-10">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="bg-gradient-to-br from-purple-500 to-indigo-600 p-2.5 rounded-xl shadow-[0_4px_14px_0_rgba(168,85,247,0.39)]">
               <Dna className="w-5 h-5 text-white" />
             </div>
             <div>
-              <CardTitle className="text-lg">Algoritmo Genético</CardTitle>
-              <CardDescription>Resultados de la optimización</CardDescription>
+              <CardTitle className="text-xl font-bold text-foreground">Algoritmo Genético</CardTitle>
+              <CardDescription className="text-muted-foreground font-medium">Resultados de la optimización</CardDescription>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             {/* Botón de Análisis con IA */}
             {onAnalisisIA && (
               <button
                 onClick={onAnalisisIA}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-lg font-medium shadow-lg shadow-purple-500/25 transition-all text-sm"
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white rounded-xl font-bold shadow-lg shadow-purple-500/25 transition-all hover:-translate-y-0.5"
               >
                 <Brain className="w-4 h-4" />
                 <span>Análisis con IA</span>
                 <Sparkles className="w-3.5 h-3.5" />
               </button>
             )}
-            <div className="text-right">
-              <h3 className="font-semibold text-slate-900 flex items-center gap-2">
+            <div className="text-right ml-auto sm:ml-0">
+              <h3 className="font-semibold text-foreground flex items-center justify-end gap-2">
                 <Route className="w-4 h-4 text-purple-500" />
                 {ruta.nombre}
               </h3>
-              <p className="text-sm text-slate-600">Bus {ruta.ruta_id}</p>
+              <p className="text-sm text-muted-foreground font-medium">Bus {ruta.ruta_id}</p>
             </div>
-            <Badge variant="secondary" className="bg-purple-100 text-purple-700">
+            <Badge variant="secondary" className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 tracking-wide font-bold">
               Optimizada
             </Badge>
           </div>
@@ -48,35 +49,35 @@ const GeneticAlgorithmPanel = ({ rutasOptimizadas, estadisticas, onAnalisisIA })
       <CardContent className="pt-6">
         {/* Layout horizontal con 4 secciones */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-          
+
           {/* Sección 1: Información de Ruta */}
           <div className="space-y-4">
-            <h4 className="text-xs font-semibold text-slate-700 uppercase tracking-wide flex items-center gap-2">
+            <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
               <Navigation className="w-3.5 h-3.5" />
               Información de Ruta
             </h4>
-            
+
             {/* Parada Inicial y Final */}
             {ruta.parametros_ga && (
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-3 space-y-2">
-                <div className="flex items-start gap-2">
-                  <div className="bg-green-500 w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <span className="text-white text-xs font-bold">I</span>
+              <div className="bg-secondary/30 border border-border/50 rounded-xl p-4 space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="bg-green-500 w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm">
+                    <span className="text-white text-[10px] font-black">I</span>
                   </div>
-                  <div className="text-xs min-w-0">
-                    <span className="font-medium text-green-700">Inicio:</span>
-                    <p className="text-slate-600 truncate">
+                  <div className="text-xs min-w-0 flex-1">
+                    <span className="font-bold text-foreground">Inicio:</span>
+                    <p className="text-muted-foreground truncate">
                       {ruta.paraderos?.[0] || `Parada ${ruta.parametros_ga.punto_inicio_idx + 1}`}
                     </p>
                   </div>
                 </div>
-                <div className="flex items-start gap-2">
-                  <div className="bg-red-500 w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <span className="text-white text-xs font-bold">F</span>
+                <div className="flex items-start gap-3">
+                  <div className="bg-destructive w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm">
+                    <span className="text-white text-[10px] font-black">F</span>
                   </div>
-                  <div className="text-xs min-w-0">
-                    <span className="font-medium text-red-700">Final:</span>
-                    <p className="text-slate-600 truncate">
+                  <div className="text-xs min-w-0 flex-1">
+                    <span className="font-bold text-foreground">Final:</span>
+                    <p className="text-muted-foreground truncate">
                       {ruta.paraderos?.[ruta.numero_paradas - 1] || `Parada ${ruta.parametros_ga.punto_fin_idx + 1}`}
                     </p>
                   </div>
@@ -85,83 +86,83 @@ const GeneticAlgorithmPanel = ({ rutasOptimizadas, estadisticas, onAnalisisIA })
             )}
 
             {/* Distancia y Métricas */}
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-3">
+            <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="bg-green-500 p-1.5 rounded-md">
+                <div className="flex items-center gap-3">
+                  <div className="bg-green-500 p-2 rounded-lg shadow-sm">
                     <TrendingDown className="w-4 h-4 text-white" />
                   </div>
-                  <span className="text-sm font-medium text-green-900">Distancia</span>
+                  <span className="text-sm font-bold text-foreground">Distancia</span>
                 </div>
-                <span className="text-xl font-bold text-green-700">{ruta.distancia_total_km} km</span>
+                <span className="text-2xl font-black text-green-600 dark:text-green-400">{ruta.distancia_total_km} <span className="text-sm font-medium">km</span></span>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
-              <div className="bg-slate-50 border border-slate-200 rounded-lg p-2 text-center">
-                <MapPin className="w-4 h-4 text-slate-600 mx-auto mb-1" />
-                <p className="text-lg font-bold text-slate-900">{ruta.numero_paradas}</p>
-                <span className="text-xs text-slate-500">Paradas</span>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-secondary/30 border border-border/50 rounded-xl p-3 text-center">
+                <MapPin className="w-4 h-4 text-muted-foreground mx-auto mb-1.5" />
+                <p className="text-xl font-black text-foreground">{ruta.numero_paradas}</p>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Paradas</span>
               </div>
-              <div className="bg-slate-50 border border-slate-200 rounded-lg p-2 text-center">
-                <Target className="w-4 h-4 text-slate-600 mx-auto mb-1" />
-                <p className="text-sm font-bold text-slate-900">{ruta.distancia_total_metros.toFixed(0)}m</p>
-                <span className="text-xs text-slate-500">Fitness</span>
+              <div className="bg-secondary/30 border border-border/50 rounded-xl p-3 text-center">
+                <Target className="w-4 h-4 text-muted-foreground mx-auto mb-1.5" />
+                <p className="text-sm font-bold text-foreground mt-1">{ruta.distancia_total_metros.toFixed(0)}m</p>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Fitness</span>
               </div>
             </div>
           </div>
 
           {/* Sección 2: Parámetros de Simulación */}
           <div className="space-y-4">
-            <h4 className="text-xs font-semibold text-slate-700 uppercase tracking-wide flex items-center gap-2">
+            <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
               <Activity className="w-3.5 h-3.5" />
               Parámetros de Simulación
             </h4>
-            <div className="grid grid-cols-2 gap-2">
-              <div className="bg-purple-50 border border-purple-200 rounded-lg p-2.5 text-center">
-                <span className="text-xs text-slate-600 block">Población</span>
-                <span className="font-bold text-purple-700 text-lg">{ruta.parametros_ga?.tamano_poblacion || 100}</span>
-                <p className="text-xs text-slate-500">individuos</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-purple-500/5 border border-purple-500/10 rounded-xl p-3 text-center">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block mb-1">Población</span>
+                <span className="font-black text-purple-600 dark:text-purple-400 text-xl">{ruta.parametros_ga?.tamano_poblacion || 100}</span>
+                <p className="text-[10px] text-muted-foreground">individuos</p>
               </div>
-              <div className="bg-purple-50 border border-purple-200 rounded-lg p-2.5 text-center">
-                <span className="text-xs text-slate-600 block">Generaciones</span>
-                <span className="font-bold text-purple-700 text-lg">{ruta.parametros_ga?.generaciones || 200}</span>
-                <p className="text-xs text-slate-500">iteraciones</p>
+              <div className="bg-indigo-500/5 border border-indigo-500/10 rounded-xl p-3 text-center">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block mb-1">Generaciones</span>
+                <span className="font-black text-indigo-600 dark:text-indigo-400 text-xl">{ruta.parametros_ga?.generaciones || 200}</span>
+                <p className="text-[10px] text-muted-foreground">iteraciones</p>
               </div>
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-2.5 text-center">
-                <span className="text-xs text-slate-600 block">Tasa Cruce</span>
-                <span className="font-bold text-blue-700 text-lg">{Math.round((ruta.parametros_ga?.tasa_cruce || 0.8) * 100)}%</span>
-                <p className="text-xs text-slate-500">PMX</p>
+              <div className="bg-blue-500/5 border border-blue-500/10 rounded-xl p-3 text-center">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block mb-1">Tasa Cruce</span>
+                <span className="font-black text-blue-600 dark:text-blue-400 text-xl">{Math.round((ruta.parametros_ga?.tasa_cruce || 0.8) * 100)}%</span>
+                <p className="text-[10px] text-muted-foreground">PMX</p>
               </div>
-              <div className="bg-orange-50 border border-orange-200 rounded-lg p-2.5 text-center">
-                <span className="text-xs text-slate-600 block">Mutación</span>
-                <span className="font-bold text-orange-700 text-lg">{Math.round((ruta.parametros_ga?.tasa_mutacion || 0.15) * 100)}%</span>
-                <p className="text-xs text-slate-500">intercambio</p>
+              <div className="bg-orange-500/5 border border-orange-500/10 rounded-xl p-3 text-center">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block mb-1">Mutación</span>
+                <span className="font-black text-orange-600 dark:text-orange-400 text-xl">{Math.round((ruta.parametros_ga?.tasa_mutacion || 0.15) * 100)}%</span>
+                <p className="text-[10px] text-muted-foreground">intercambio</p>
               </div>
             </div>
           </div>
 
           {/* Sección 3: Evolución del Algoritmo */}
           <div className="space-y-4">
-            <h4 className="text-xs font-semibold text-slate-700 uppercase tracking-wide">
+            <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
               Evolución del Algoritmo
             </h4>
-            <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 space-y-3">
+            <div className="bg-secondary/30 border border-border/50 rounded-xl p-4 space-y-4">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-600">Selección:</span>
-                <Badge variant="outline" className="text-xs">Torneo (k=3)</Badge>
+                <span className="text-muted-foreground font-medium">Selección:</span>
+                <Badge variant="outline" className="text-xs bg-background/50">Torneo (k=3)</Badge>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-600">Cruce:</span>
-                <Badge variant="outline" className="text-xs">PMX</Badge>
+                <span className="text-muted-foreground font-medium">Cruce:</span>
+                <Badge variant="outline" className="text-xs bg-background/50">PMX</Badge>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-600">Elitismo:</span>
-                <Badge variant="outline" className="text-xs">{ruta.parametros_ga?.elitismo || 2} mejores</Badge>
+                <span className="text-muted-foreground font-medium">Elitismo:</span>
+                <Badge variant="outline" className="text-xs bg-background/50">{ruta.parametros_ga?.elitismo || 2} mejores</Badge>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-600">Convergencia:</span>
-                <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">
+                <span className="text-muted-foreground font-medium">Convergencia:</span>
+                <Badge variant="secondary" className="text-xs bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                   ✓ Óptimo encontrado
                 </Badge>
               </div>
@@ -170,29 +171,28 @@ const GeneticAlgorithmPanel = ({ rutasOptimizadas, estadisticas, onAnalisisIA })
 
           {/* Sección 4: Secuencia Optimizada */}
           <div className="space-y-4">
-            <h4 className="text-xs font-semibold text-slate-700 uppercase tracking-wide flex items-center gap-2">
+            <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
               <Flag className="w-3.5 h-3.5" />
               Secuencia Optimizada
             </h4>
             {ruta.orden_optimizado && (
-              <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+              <div className="bg-secondary/30 border border-border/50 rounded-xl p-4">
                 <div className="flex flex-wrap gap-2">
                   {ruta.orden_optimizado.map((idx, i) => (
-                    <Badge 
+                    <Badge
                       key={i}
-                      variant={i === 0 ? "default" : i === ruta.orden_optimizado.length - 1 ? "destructive" : "outline"}
-                      className={`text-sm font-mono ${
-                        i === 0 ? 'bg-green-500 hover:bg-green-600' : 
-                        i === ruta.orden_optimizado.length - 1 ? 'bg-red-500 hover:bg-red-600' : ''
-                      }`}
+                      variant="outline"
+                      className={`text-sm font-mono border-border/50 bg-background/50 ${i === 0 ? '!bg-green-500 !text-white !border-transparent hover:!bg-green-600' :
+                          i === ruta.orden_optimizado.length - 1 ? '!bg-destructive !text-white !border-transparent hover:!bg-destructive/90' : ''
+                        }`}
                     >
                       {idx + 1}
                     </Badge>
                   ))}
                 </div>
-                <p className="text-xs text-slate-500 mt-3">
-                  <span className="inline-block w-3 h-3 bg-green-500 rounded mr-1"></span> Inicio
-                  <span className="inline-block w-3 h-3 bg-red-500 rounded ml-3 mr-1"></span> Final
+                <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mt-4 flex items-center justify-center">
+                  <span className="inline-block w-2.5 h-2.5 bg-green-500 rounded-sm mr-1.5 shrink-0"></span> Inicio
+                  <span className="inline-block w-2.5 h-2.5 bg-destructive rounded-sm ml-4 mr-1.5 shrink-0"></span> Final
                 </p>
               </div>
             )}

@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+/* Modern SaaS Aesthetic with Deep Contrasts */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,48 +7,79 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 210 40% 98%;
+    /* Very light slate */
     --foreground: 222.2 84% 4.9%;
+    /* Deep blue/black */
     --card: 0 0% 100%;
+    /* Pure white */
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
+
+    /* Primary: Sophisticated Indigo/Blue */
+    --primary: 235 86% 65%;
+    /* Vivid Indigo */
     --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
+
+    /* Secondary: Soft Slate */
+    --secondary: 214 32% 91%;
     --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
+
+    /* Muted: Subtle gray for less important text/bg */
+    --muted: 214 32% 91%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+
+    /* Accent: A glowing cyan/teal for highlights */
+    --accent: 180 100% 40%;
+    --accent-foreground: 0 0% 100%;
+
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
+
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.5rem;
+    --ring: 235 86% 65%;
+    --radius: 1rem;
+    /* More rounded luxury feel */
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    --background: 224 71% 4%;
+    /* Very deep, rich blue/black */
     --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
+    /* Off white */
+
+    --card: 226 58% 7%;
+    /* Slightly lighter than background, very subtle */
     --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
+
+    --popover: 226 58% 7%;
     --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
+
+    /* Primary: Electric Indigo */
+    --primary: 235 86% 65%;
+    --primary-foreground: 210 40% 98%;
+
+    /* Secondary: Deep slate */
+    --secondary: 226 30% 15%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
+
+    /* Muted: Subdued dark slate */
+    --muted: 226 30% 15%;
     --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+
+    /* Accent: Neon Cyan for amazing dark mode pop */
+    --accent: 180 100% 50%;
+    --accent-foreground: 224 71% 4%;
+
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
+
+    --border: 226 30% 15%;
+    /* Dark borders */
+    --input: 226 30% 15%;
+    --ring: 235 86% 65%;
   }
 }
 
@@ -55,15 +87,52 @@
   * {
     @apply border-border;
   }
+
   body {
-    @apply bg-background text-foreground;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    @apply bg-background text-foreground transition-colors duration-300;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+  }
+}
+
+/* Glassmorphism utility */
+.glass-effect {
+  @apply bg-card/70 backdrop-blur-xl border border-border/50 shadow-sm transition-all duration-300;
+}
+
+.dark .glass-effect {
+  @apply bg-card/60 backdrop-blur-xl border-border/40 shadow-2xl;
+}
+
+/* Beautiful custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-muted-foreground/30 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-muted-foreground/50;
 }
 
 /* Leaflet overrides */
 .leaflet-container {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
 }
 
 /* Custom bus marker animation */
@@ -72,9 +141,12 @@
 }
 
 @keyframes pulse-bus {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.05);
   }

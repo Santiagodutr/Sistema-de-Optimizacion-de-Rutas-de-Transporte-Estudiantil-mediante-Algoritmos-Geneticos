@@ -96,6 +96,9 @@ env/
 .sass-cache/
 *.pem
 
+.agent/
+.agents/
+
 # Keep package-lock.json and requirements.txt under version control
 # but ignore lockfiles you don't want:
 # package-lock.json
